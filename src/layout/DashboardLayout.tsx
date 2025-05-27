@@ -26,7 +26,7 @@ const DashboardLayout = () => {
           </div>
 
           {/* Right: Notification, language selector, user profile */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center text-black gap-4">
             {/* Notification icon */}
             <Button variant="ghost" size="icon" aria-label="Notifications">
               <MdNotificationsNone className="w-6 h-6" />
