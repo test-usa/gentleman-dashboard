@@ -21,7 +21,7 @@ createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <ThemeInitializer />
       <ToastContainer />
-      <App/>
+      
     </BrowserRouter>
   </StrictMode>
 );
