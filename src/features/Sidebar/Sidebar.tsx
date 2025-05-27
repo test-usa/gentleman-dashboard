@@ -1,35 +1,49 @@
-import { useSidebarStore } from "@/store/useSidebarStore";
-import { Button } from "@/components/ui/button";
-import { NavLink } from "react-router-dom";
-import { IoHome } from "react-icons/io5";
-import { IoBarChartSharp } from "react-icons/io5";
-import { IoMdSettings } from "react-icons/io";
-import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
-import { motion } from "framer-motion";
-import { TbLayoutDashboardFilled } from "react-icons/tb";
+import { useLayoutEffect } from "react"
+import { useSidebarStore } from "@/store/useSidebarStore"
+import { Button } from "@/components/ui/button"
+import { NavLink } from "react-router-dom"
+import { IoHome, IoBarChart, IoSettingsSharp } from "react-icons/io5"
+import { FaHistory, FaArrowLeft, FaArrowRight } from "react-icons/fa"
+import { motion } from "framer-motion"
+import { TbLayoutDashboard } from "react-icons/tb"
 
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/components/ui/tooltip"
 
 const Sidebar = () => {
-  const isOpen = useSidebarStore((state) => state.isOpen);
-  const toggle = useSidebarStore((state) => state.toggle);
+  const isOpen = useSidebarStore((state) => state.isOpen)
+  const isMobile = useSidebarStore((state) => state.isMobile)
+  const toggle = useSidebarStore((state) => state.toggle)
+  const setOpen = useSidebarStore((state) => state.setOpen)
+  const setMobile = useSidebarStore((state) => state.setMobile)
+
+  useLayoutEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768
+      setMobile(mobile)
+      setOpen(!mobile) // Close sidebar if mobile, open if desktop
+    }
+
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [setMobile, setOpen])
 
   const sidebarVariants = {
     open: { width: "16rem" },
     closed: { width: "4rem" },
-  };
+  }
 
   const menuItems = [
-    { to: "/", icon: <IoHome className="w-5 h-5" />, text: "Tableau de bord" },
-    { to: "/utilisateurs", icon: <IoBarChartSharp className="w-5 h-5" />, text: "Utilisateurs" },
-    { to: "/history", icon: <IoMdSettings className="w-5 h-5" />, text: "History" },
-    { to: "/request", icon: <IoMdSettings className="w-5 h-5" />, text: "Request" },
-  ];
+    { to: "/", icon: <IoHome className="w-5 h-5" />, text: "Dashboard" },
+    { to: "/utilisateurs", icon: <IoBarChart className="w-5 h-5" />, text: "Utilisateurs" },
+    { to: "/history", icon: <FaHistory className="w-5 h-5" />, text: "Historique" },
+    { to: "/request", icon: <IoSettingsSharp className="w-5 h-5" />, text: "Requêtes" },
+  ]
 
   return (
     <motion.aside
@@ -38,20 +52,19 @@ const Sidebar = () => {
       variants={sidebarVariants}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className={`bg-[#111827] text-white border-r min-h-screen p-4 overflow-hidden flex flex-col ${
-        !isOpen ? "px-10 items-center" : ""
+        !isOpen ? "px-2 items-center" : ""
       }`}
     >
       <div className="flex justify-between items-center">
         <h2 className="font-bold text-lg">
-          {isOpen ? (
-            "Admin Panel"
-          ) : (
-            <TbLayoutDashboardFilled className="w-7 h-7" />
-          )}
+          {isOpen ? "Admin Panel" : <TbLayoutDashboard className="w-7 h-7" />}
         </h2>
-        <Button className="ms-1" variant="ghost" size="sm" onClick={toggle}>
-          {isOpen ? <FaLongArrowAltLeft /> : <FaLongArrowAltRight />}
-        </Button>
+        {/* Optionally hide toggle on desktop */}
+        {isMobile && (
+          <Button className="ms-1" variant="ghost" size="sm" onClick={toggle}>
+            {isOpen ? <FaArrowLeft /> : <FaArrowRight />}
+          </Button>
+        )}
       </div>
 
       <nav className="flex-1 mt-12">
@@ -104,7 +117,7 @@ const Sidebar = () => {
         </TooltipProvider>
       </nav>
     </motion.aside>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar
