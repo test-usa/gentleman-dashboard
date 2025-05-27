@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 
-const Setting = () => {
+const History = () => {
   return (
     <div>
       <Button onClick={() => toast.success("Settings saved successfully!")}>
-        Setting
+      History
       </Button>
     </div>
   );
 };
 
-export default Setting;
+export default History;
