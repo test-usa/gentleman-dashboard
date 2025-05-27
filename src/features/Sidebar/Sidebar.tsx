@@ -1,44 +1,49 @@
-import { useSidebarStore } from "@/store/useSidebarStore";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { IoHome } from "react-icons/io5";
-import { IoBarChartSharp } from "react-icons/io5";
-import { IoMdSettings } from "react-icons/io";
-import { FaLongArrowAltLeft } from "react-icons/fa";
-import { FaLongArrowAltRight } from "react-icons/fa";
-import { motion } from "framer-motion";
-import { TbLayoutDashboardFilled } from "react-icons/tb";
+import { useLayoutEffect } from "react"
+import { useSidebarStore } from "@/store/useSidebarStore"
+import { Button } from "@/components/ui/button"
+import { NavLink } from "react-router-dom"
+import { IoHome, IoBarChart, IoSettingsSharp } from "react-icons/io5"
+import { FaHistory, FaArrowLeft, FaArrowRight } from "react-icons/fa"
+import { motion } from "framer-motion"
+import { TbLayoutDashboard } from "react-icons/tb"
 
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/components/ui/tooltip"
 
 const Sidebar = () => {
-  const isOpen = useSidebarStore((state) => state.isOpen);
-  const toggle = useSidebarStore((state) => state.toggle);
+  const isOpen = useSidebarStore((state) => state.isOpen)
+ 
+  const toggle = useSidebarStore((state) => state.toggle)
+  const setOpen = useSidebarStore((state) => state.setOpen)
+  const setMobile = useSidebarStore((state) => state.setMobile)
+
+  useLayoutEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768
+      setMobile(mobile)
+      setOpen(!mobile) // Close sidebar if mobile, open if desktop
+    }
+
+    handleResize()
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
+  }, [setMobile, setOpen])
 
   const sidebarVariants = {
     open: { width: "16rem" },
     closed: { width: "4rem" },
-  };
+  }
 
   const menuItems = [
-    { to: "/dashboard", icon: <IoHome className="w-5 h-5" />, text: "Home" },
-    {
-      to: "/analytics",
-      icon: <IoBarChartSharp className="w-5 h-5" />,
-      text: "Analytics",
-    },
-    {
-      to: "/settings",
-      icon: <IoMdSettings className="w-5 h-5" />,
-      text: "Settings",
-    },
-    { to: "/about", icon: <IoMdSettings className="w-5 h-5" />, text: "About" },
-  ];
+    { to: "/", icon: <IoHome className="w-5 h-5" />, text: "Dashboard" },
+    { to: "/utilisateurs", icon: <IoBarChart className="w-5 h-5" />, text: "Utilisateurs" },
+    { to: "/history", icon: <FaHistory className="w-5 h-5" />, text: "Historique" },
+    { to: "/request", icon: <IoSettingsSharp className="w-5 h-5" />, text: "Requêtes" },
+  ]
 
   return (
     <motion.aside
@@ -46,21 +51,20 @@ const Sidebar = () => {
       animate={isOpen ? "open" : "closed"}
       variants={sidebarVariants}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className={`bg-primary text-white dark:bg-primary-dark border-r min-h-screen p-4 overflow-hidden flex flex-col ${
-        !isOpen ? "px-10 items-center" : ""
+      className={`bg-[#111827] text-white border-r min-h-screen p-4 overflow-hidden flex flex-col ${
+        !isOpen ? "px-2 items-center" : ""
       }`}
     >
       <div className="flex justify-between items-center">
         <h2 className="font-bold text-lg">
-          {isOpen ? (
-            "Dashboard"
-          ) : (
-            <TbLayoutDashboardFilled className="w-7 h-7" />
-          )}
+          {isOpen ? "Admin Panel" : <TbLayoutDashboard className="w-7 h-7" />}
         </h2>
-        <Button className="ms-1" variant="ghost" size="sm" onClick={toggle}>
-          {isOpen ? <FaLongArrowAltLeft /> : <FaLongArrowAltRight />}
-        </Button>
+        {/* Optionally hide toggle on desktop */}
+        
+          <Button className="ms-1" variant="ghost" size="sm" onClick={toggle}>
+            {isOpen ? <FaArrowLeft /> : <FaArrowRight />}
+          </Button>
+        
       </div>
 
       <nav className="flex-1 mt-12">
@@ -75,25 +79,37 @@ const Sidebar = () => {
                 {!isOpen ? (
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Link
+                      <NavLink
                         to={item.to}
-                        className="w-10 h-10 flex items-center justify-center p-2 rounded-lg hover:bg-white hover:text-black dark:hover:bg-primary transition-colors"
+                        className={({ isActive }) =>
+                          `w-10 h-10 flex items-center justify-center p-2 rounded-lg transition-colors ${
+                            isActive
+                              ? "bg-[#F9AA43] text-black"
+                              : "hover:bg-[#F9AA43] hover:text-black"
+                          }`
+                        }
                       >
                         {item.icon}
-                      </Link>
+                      </NavLink>
                     </TooltipTrigger>
                     <TooltipContent side="right" className="ml-2">
                       {item.text}
                     </TooltipContent>
                   </Tooltip>
                 ) : (
-                  <Link
+                  <NavLink
                     to={item.to}
-                    className="flex items-center justify-start p-2 rounded-lg hover:bg-white hover:text-black dark:hover:bg-primary transition-colors"
+                    className={({ isActive }) =>
+                      `flex items-center justify-start p-2 rounded-lg transition-colors ${
+                        isActive
+                          ? "bg-[#F9AA43] text-black"
+                          : "hover:bg-[#F9AA43] hover:text-black"
+                      }`
+                    }
                   >
                     {item.icon}
                     <span className="ml-2 font-medium">{item.text}</span>
-                  </Link>
+                  </NavLink>
                 )}
               </motion.li>
             ))}
@@ -101,7 +117,7 @@ const Sidebar = () => {
         </TooltipProvider>
       </nav>
     </motion.aside>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar
