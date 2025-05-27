@@ -170,7 +170,7 @@ const History = () => {
     </div>
 
       {/* Transaction History */}
-      <div>
+      <div className='text-black'>
         <h2 className="text-xl font-semibold mb-3">Transaction History</h2>
         <div className="overflow-auto rounded-lg shadow">
           <table className="min-w-full bg-white">
