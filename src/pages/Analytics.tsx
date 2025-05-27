@@ -1,5 +1,5 @@
-const Home = () => {
-  return <div>Dashboard Home</div>;
+const Analytics = () => {
+  return <div>Dashboard analytics</div>;
 };
 
-export default Home;
+export default Analytics;
