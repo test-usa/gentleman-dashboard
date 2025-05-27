@@ -110,7 +110,7 @@ const History = () => {
    <div className=''>
     <div>
       <h1 className='px-5'>Booking</h1>
-      <hr className='my-3' />
+      <hr className='my-5' />
     </div>
      <div className=" mx-auto   space-y-6 ">
       {/* Summary Cards */}
