@@ -16,7 +16,7 @@ import {
 
 const Sidebar = () => {
   const isOpen = useSidebarStore((state) => state.isOpen)
-  const isMobile = useSidebarStore((state) => state.isMobile)
+ 
   const toggle = useSidebarStore((state) => state.toggle)
   const setOpen = useSidebarStore((state) => state.setOpen)
   const setMobile = useSidebarStore((state) => state.setMobile)
@@ -60,11 +60,11 @@ const Sidebar = () => {
           {isOpen ? "Admin Panel" : <TbLayoutDashboard className="w-7 h-7" />}
         </h2>
         {/* Optionally hide toggle on desktop */}
-        {isMobile && (
+        
           <Button className="ms-1" variant="ghost" size="sm" onClick={toggle}>
             {isOpen ? <FaArrowLeft /> : <FaArrowRight />}
           </Button>
-        )}
+        
       </div>
 
       <nav className="flex-1 mt-12">

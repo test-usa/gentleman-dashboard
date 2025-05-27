@@ -8,14 +8,14 @@ import { FaChevronDown } from "react-icons/fa";
 
 const DashboardLayout = () => {
   return (
-    <div className="flex h-screen bg-[#f0f0f0]"> {/* Make layout full viewport height */}
+    <div className="flex h-screen "> {/* Make layout full viewport height */}
       <div className="max-w-xs bg-white border-r border-gray-200">
         <Sidebar />
       </div>
 
       <div className="flex-1 flex flex-col">
         {/* Header with fixed height */}
-        <header className="bg-transparent px-6 py-4 flex justify-between items-center flex-shrink-0">
+        <header className="bg-[#f0f0f0] px-6 py-4 flex justify-between items-center flex-shrink-0">
           <div className="max-w-sm w-full relative">
             <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
             <Input
@@ -57,7 +57,7 @@ const DashboardLayout = () => {
         </header>
 
         {/* Main content area, fill remaining height & scroll if needed */}
-        <main className="flex-1 overflow-auto bg-transparent p-6">
+        <main className="flex-1 overflow-x-auto bg-[#f0f0f0] p-6">
           <Outlet />
         </main>
       </div>
