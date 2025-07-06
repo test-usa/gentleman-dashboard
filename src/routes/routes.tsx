@@ -4,6 +4,8 @@ import Request from "@/pages/Request";
 import Home from "@/pages/Home";
 import Utilisateurs from "@/pages/Utilisateurs";
 import History from "@/pages/History";
+import Error from "@/Error/Error";
+
 
 const AppRoutes = () => {
   return (
@@ -13,6 +15,7 @@ const AppRoutes = () => {
         <Route path="utilisateurs" element={<Utilisateurs />} />
         <Route path="history" element={<History />} />
         <Route path="request" element={<Request />} />
+        <Route path="*" element={<Error />} /> {/* Catch-all route */}
       </Route>
     </Routes>
   );
