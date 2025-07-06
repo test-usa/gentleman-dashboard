@@ -1,3 +1,4 @@
+import { Input } from '@/components/ui/input';
 import {
   CalendarDays,
   CheckCircle,
@@ -38,6 +39,7 @@ const summary = [
 
 
 import { Wrench } from 'lucide-react';
+import { MdSearch } from 'react-icons/md';
 
 const transactions = [
   {
@@ -107,9 +109,9 @@ const History = () => {
     <div className=''>
       <div>
         <h1 className='px-5'>Booking</h1>
-        <hr className='my-5' />
+        <hr className='my-4' />
       </div>
-      <div className=" mx-auto   space-y-6 ">
+      <div className=" mx-auto   space-y-8 ">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ">
           {summary.map((item, idx) => (
@@ -126,7 +128,11 @@ const History = () => {
 
         {/* Upcoming Bookings */}
         <div>
-          <h2 className="text-xl font-semibold mb-3">Upcoming Bookings</h2>
+          <div className='flex items-center justify-between mx-4'>
+             <h2 className="text-xl font-semibold mb-3">Upcoming Bookings</h2>
+             <h2 className='text-[#F9AA43] text-sm'>View All</h2>
+          </div>
+         
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {transactions.slice(0, 3).map((item, idx) => (
               <div key={idx} className="bg-white p-4 rounded shadow space-y-3">
@@ -167,10 +173,17 @@ const History = () => {
 
         {/* Transaction History section */ }
         <div className='my-3'>
-          <div className='flex justify-between mx-3'>
+          <div className='flex items-center justify-between mx-3 mb-4'>
             <h2 className="text-xl font-semibold mb-3">Transaction History</h2> 
-            <div className='flex'>
-              <input className='' type="text" />
+            <div className='flex gap-3'>
+              <div className="max-w-sm w-full relative">
+            <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <Input
+              type="text"
+              placeholder="Search transactions..."
+              className="w-full pl-8 " 
+            />
+          </div>
              <div className='flex items-center gap-2'>
                <ListFilter className="w-5 h-5 text-gray-600" />
 
