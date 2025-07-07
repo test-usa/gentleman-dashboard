@@ -1,108 +1,127 @@
 import { Input } from '@/components/ui/input';
+import { useGetPaymentAndBookingQuery } from '@/Redux/features/dashboard/history/getPaymentAndBookingApi';
+import { useGetTranstionIdQuery } from '@/Redux/features/dashboard/history/getTranstionIdApi';
+import { useGetUpCommingQuery } from '@/Redux/features/dashboard/history/getUpCommingBooking';
+
 import {
   CalendarDays,
   CheckCircle,
   DollarSign,
   Clock,
   CreditCard,
-  Banknote,
+
   ListFilter
 } from 'lucide-react';
-const summary = [
-  {
-    title: 'Active Bookings',
-    value: 3,
-    desc: 'Upcoming',
-    icon: <CalendarDays className="w-6 h-6 text-blue-500" />,
-  },
-  {
-    title: 'Completed Bookings',
-    value: 12,
-    desc: 'This Month',
-    icon: <CheckCircle className="w-6 h-6 text-green-500" />,
-  },
-  {
-    title: 'Total Revenue',
-    value: '$1,248.00',
-    desc: 'This Month',
-    icon: <DollarSign className="w-6 h-6 text-yellow-500" />,
-  },
-  {
-    title: 'Pending Payments',
-    value: '$245.00',
-    desc: 'To Collect',
-    icon: <Clock className="w-6 h-6 text-orange-500" />,
-  },
-];
 
 
 
 
 import { Wrench } from 'lucide-react';
+import type { JSX, ReactNode } from 'react';
 import { MdSearch } from 'react-icons/md';
+type TUpcomingBooking = {
+  id: string;
+  title?: string;
+  createdAt: string;
+  status: string;
+  desireDate:string;
+  price?: number | string; 
 
-const transactions = [
-  {
-    id: 'TRK-2023-001',
-    service: 'Car Repair',
-    date: 'Dec 1, 2023',
-    amount: '$149.00',
-    status: 'Completed',
-    methodIcon: <CreditCard className="w-5 h-5 text-gray-700" />,
-    method: '2 hours',
-    icon: <Wrench className="w-6 h-6 text-blue-500" />
-  },
-  {
-    id: 'TRK-2023-002',
-    service: 'Car Repair',
-    date: 'Dec 3, 2023',
-    amount: '$89.00',
-    status: 'Pending',
-    method: '2 hours',
-    methodIcon: <Banknote className="w-5 h-5 text-indigo-500" />,
-    icon: <Wrench className="w-6 h-6 text-yellow-500" />
-  },
-  {
-    id: 'TRK-2023-003',
-    service: 'Car Repair',
-    date: 'Dec 5, 2023',
-    amount: '$269.00',
-    status: 'Confirmed',
-    method: '2 hours',
-    methodIcon: <CreditCard className="w-5 h-5 text-purple-500" />,
+};
+type TFormattedBooking = {
+  id: string;
+  service: string;
+  date: string;
+  status: string;
+  desireDate:string;
+  method: string;
+  price:string;
+  methodIcon: JSX.Element;
+  icon: JSX.Element;
+};
 
-    icon: <Wrench className="w-6 h-6 text-green-500" />
 
-  },
-  {
-    id: 'TRK-2023-003',
-    service: 'Car Repair',
-    date: 'Dec 5, 2023',
-    amount: '$269.00',
-    status: 'Confirmed',
-    method: '2 hours',
-    methodIcon: <CreditCard className="w-5 h-5 text-purple-500" />,
 
-    icon: <Wrench className="w-6 h-6 text-green-500" />
 
-  },
-  {
-    id: 'TRK-2023-003',
-    service: 'Car Repair',
-    date: 'Dec 5, 2023',
-    amount: '$269.00',
-    status: 'Confirmed',
-    method: '2 hours',
-    methodIcon: <CreditCard className="w-5 h-5 text-purple-500" />,
+interface TTransactionItem {
+  id: string;
+  service: string;
+  date: string;
+  amount: string;
+  status: string;
+  method: string;
+  methodIcon: ReactNode;
+  icon: ReactNode;
+}
 
-    icon: <Wrench className="w-6 h-6 text-green-500" />
-
-  },
-
-];
-
+interface ApiTransaction {
+  senderPaymentTransaction: string;
+  serviceTitle: string;
+  createdAt: string;
+  amount: number;
+  status: string;
+}
 
 const History = () => {
+  const{data} = useGetPaymentAndBookingQuery(undefined)
+
+  const{data:transtion}=useGetTranstionIdQuery(undefined)
+  
+ const {data:upcomming}=useGetUpCommingQuery(undefined)
+
+ console.log(upcomming)
+   const summary = [
+    {
+      title: "Active Bookings",
+      value: data?.data?.activeBookings ?? 0,
+      desc: "Upcoming",
+      icon: <CalendarDays className="w-6 h-6 text-blue-500" />,
+    },
+    {
+      title: "Completed Bookings",
+      value: data?.data?.completedBookings ?? 0,
+      desc: "This Month",
+      icon: <CheckCircle className="w-6 h-6 text-green-500" />,
+    },
+    {
+      title: "Total Revenue",
+      value: `$${data?.data?.totalRevenueThisMonth?.toFixed(2) ?? "0.00"}`,
+      desc: "This Month",
+      icon: <DollarSign className="w-6 h-6 text-yellow-500" />,
+    },
+    {
+      title: "Pending Payments",
+      value: `$${data?.data?.pendingPaymentsThisMonth?.toFixed(2) ?? "0.00"}`,
+      desc: "To Collect",
+      icon: <Clock className="w-6 h-6 text-orange-500" />,
+    },
+  ];
+
+
+ const transactions:TTransactionItem[] = transtion?.data?.map((item: ApiTransaction) => ({
+  id: item.senderPaymentTransaction,
+  service: item.serviceTitle || "Unknown Service",
+  date: new Date(item.createdAt).toLocaleDateString(),
+  amount: `$${item.amount.toFixed(2)}`,
+  status: item.status,
+  method: "2 hours", // hardcoded if not from API
+  methodIcon: <CreditCard className="w-5 h-5 text-gray-700" />, // dynamic logic can be added
+  icon: <Wrench className="w-6 h-6 text-blue-500" />, // dynamic logic can be added
+})) ?? [];
+
+
+const upcomingBookings: TFormattedBooking[] = upcomming?.data?.data?.map((item: TUpcomingBooking) => ({
+  id: item.id,
+  service: item.title || "Unknown Service",
+  date: new Date(item.createdAt).toLocaleDateString(),
+  status: item.status,
+  desireDate:item.desireDate,
+  method: "Not Assigned",
+  price: item.price ? `$${item.price}` : "N/A",
+  methodIcon: <Wrench className="w-5 h-5 text-gray-500" />,
+  icon: <Wrench className="w-6 h-6 text-blue-500" />
+})) ?? [];
+
 
  return (
 
@@ -134,7 +153,7 @@ const History = () => {
           </div>
          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {transactions.slice(0, 3).map((item, idx) => (
+            {upcomingBookings.slice(0, 3).map((item: TFormattedBooking, idx: number) => (
               <div key={idx} className="bg-white p-4 rounded shadow space-y-3">
                 {/* Icon + Service + Date + Status */}
                 <div className="flex justify-between items-start">
@@ -162,9 +181,9 @@ const History = () => {
                   <div className='flex gap-2'>
                     <span><Clock className="w-4 h-4 text-gray-500" />
                     </span>
-                    <span>{item.method}</span>
+                    <span>{item.desireDate}</span>
                   </div>
-                  <span className="font-semibold text-gray-800">{item.amount}</span>
+                  <span className="font-semibold text-gray-800">{item.price}</span>
                 </div>
               </div>
             ))}

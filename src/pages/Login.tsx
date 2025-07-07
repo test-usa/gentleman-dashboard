@@ -1,22 +1,32 @@
 // src/pages/Login.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/store/useAuthStore";
-import { FaRegEye } from "react-icons/fa";
-import { FaRegEyeSlash } from "react-icons/fa";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import { useLoginMutation } from "@/Redux/features/auth/loginApi";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/Redux/features/auth/authSlice";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [login] = useLoginMutation();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  const { login } = useAuthStore();
   const navigate = useNavigate();
+  const dispatch = useDispatch()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login({ username, role: "user" });
-    navigate("/dashboard");
+    try {
+      const result = await login({email,password});
+      if(result?.data?.success){
+        dispatch(setUser({user:result?.data?.data?.user, token:result?.data?.data?.accessToken
+}))
+        alert(result?.data?.message);
+        navigate('/')
+      }
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   return (
@@ -26,14 +36,18 @@ const Login = () => {
         className="bg-white p-6 rounded space-y-4 w-[400px] py-12 shadow-2xl"
       >
         <h2 className="text-xl text-primary font-bold text-center">Login</h2>
+
+        {/* Email */}
         <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           className="w-full px-4 py-2 rounded bg-gray-200 text-black focus:outline-none"
           required
         />
+
+        {/* Password */}
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
@@ -50,6 +64,8 @@ const Login = () => {
             {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
           </span>
         </div>
+
+        {/* Submit */}
         <button
           type="submit"
           className="w-full bg-primary hover:bg-primary/80 py-2 rounded"
