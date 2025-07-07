@@ -5,11 +5,17 @@ import Home from "@/pages/Home";
 import Utilisateurs from "@/pages/Utilisateurs";
 import History from "@/pages/History";
 import Error from "@/Error/Error";
-
+import Signup from "@/pages/Signup";
+import Login from "@/pages/Login";
 
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* ✅ Fixed signup route */}
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/login" element={<Login />} />
+
+      {/* ✅ Nested routes under DashboardLayout */}
       <Route path="/" element={<DashboardLayout />}>
         <Route index element={<Home />} />
         <Route path="utilisateurs" element={<Utilisateurs />} />
@@ -22,3 +28,4 @@ const AppRoutes = () => {
 };
 
 export default AppRoutes;
+

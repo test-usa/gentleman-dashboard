@@ -1,17 +1,40 @@
 // src/pages/Signup.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/store/useAuthStore";
+import { useRegisterMutation } from "@/Redux/features/auth/registerApi";
 
 const Signup = () => {
-  const [username, setUsername] = useState("");
-  const { login } = useAuthStore();
+  const [register] = useRegisterMutation()
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-    login({ username, role: "user" });
-    navigate("/dashboard");
+ try {
+     
+    const result = await register(formData)
+    console.log(result)
+    if(result?.data?.success){
+      alert(result?.data?.message);
+      navigate('/login')
+    }
+
+ } catch (error) {
+  console.log(error)
+ }
   };
 
   return (
@@ -21,14 +44,41 @@ const Signup = () => {
         className="bg-gray-800 p-6 rounded shadow-md space-y-4 w-96"
       >
         <h2 className="text-xl font-bold text-center">Sign Up</h2>
+
+        {/* Name */}
         <input
           type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          name="name"
+          placeholder="Full Name"
+          value={formData.name}
+          onChange={handleChange}
           className="w-full px-4 py-2 rounded bg-gray-700 focus:outline-none"
           required
         />
+
+        {/* Email */}
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={formData.email}
+          onChange={handleChange}
+          className="w-full px-4 py-2 rounded bg-gray-700 focus:outline-none"
+          required
+        />
+
+        {/* Password */}
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          className="w-full px-4 py-2 rounded bg-gray-700 focus:outline-none"
+          required
+        />
+
+        {/* Submit Button */}
         <button
           type="submit"
           className="w-full bg-green-600 hover:bg-green-700 py-2 rounded"
