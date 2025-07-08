@@ -1,52 +1,38 @@
-import { Input } from '@/components/ui/input';
-import { useGetPaymentAndBookingQuery } from '@/Redux/features/dashboard/history/getPaymentAndBookingApi';
-import { useGetTranstionIdQuery } from '@/Redux/features/dashboard/history/getTranstionIdApi';
-import { useGetUpCommingQuery } from '@/Redux/features/dashboard/history/getUpCommingBooking';
+import { Input } from "@/components/ui/input";
+import { useGetPaymentAndBookingQuery } from "@/Redux/features/dashboard/history/getPaymentAndBookingApi";
+import { useGetTranstionIdQuery } from "@/Redux/features/dashboard/history/getTranstionIdApi";
+import { useGetUpCommingQuery } from "@/Redux/features/dashboard/history/getUpCommingBooking";
+import img from "../assets/FRAME.png";
 
 import {
   CalendarDays,
   CheckCircle,
   DollarSign,
   Clock,
-  CreditCard,
+  ListFilter,
+} from "lucide-react";
 
-  ListFilter
-} from 'lucide-react';
+import { useState, type JSX, type ReactNode } from "react";
+import { MdSearch } from "react-icons/md";
 
-
-
-
-import { Wrench } from 'lucide-react';
-import type { JSX, ReactNode } from 'react';
-import { MdSearch } from 'react-icons/md';
-type TUpcomingBooking = {
-  id: string;
-  title?: string;
-  createdAt: string;
-  status: string;
-  desireDate:string;
-  price?: number | string; 
-
-};
 type TFormattedBooking = {
   id: string;
-  service: string;
-  date: string;
+  title: string;
+  createdAt: string;
   status: string;
-  desireDate:string;
+  desireDate: string;
   method: string;
-  price:string;
+  price: string;
+  vehicleImage: string;
   methodIcon: JSX.Element;
   icon: JSX.Element;
 };
 
-
-
-
 interface TTransactionItem {
   id: string;
-  service: string;
-  date: string;
+  senderPaymentTransaction:string;
+  serviceTitle: string;
+  updatedAt: string;
   amount: string;
   status: string;
   method: string;
@@ -54,23 +40,14 @@ interface TTransactionItem {
   icon: ReactNode;
 }
 
-interface ApiTransaction {
-  senderPaymentTransaction: string;
-  serviceTitle: string;
-  createdAt: string;
-  amount: number;
-  status: string;
-}
-
 const History = () => {
-  const{data} = useGetPaymentAndBookingQuery(undefined)
+  const { data } = useGetPaymentAndBookingQuery(undefined);
 
-  const{data:transtion}=useGetTranstionIdQuery(undefined)
-  
- const {data:upcomming}=useGetUpCommingQuery(undefined)
+  const { data: transtion } = useGetTranstionIdQuery(undefined);
 
- console.log(upcomming)
-   const summary = [
+  const { data: upcomming } = useGetUpCommingQuery(undefined);
+
+  const summary = [
     {
       title: "Active Bookings",
       value: data?.data?.activeBookings ?? 0,
@@ -98,53 +75,33 @@ const History = () => {
   ];
 
 
- const transactions:TTransactionItem[] = transtion?.data?.map((item: ApiTransaction) => ({
-  id: item.senderPaymentTransaction,
-  service: item.serviceTitle || "Unknown Service",
-  date: new Date(item.createdAt).toLocaleDateString(),
-  amount: `$${item.amount.toFixed(2)}`,
-  status: item.status,
-  method: "2 hours", // hardcoded if not from API
-  methodIcon: <CreditCard className="w-5 h-5 text-gray-700" />, // dynamic logic can be added
-  icon: <Wrench className="w-6 h-6 text-blue-500" />, // dynamic logic can be added
-})) ?? [];
+  const [searchTerm, setSearchTerm] = useState("");
+
+const filteredTransactions = transtion?.data?.filter((item: TTransactionItem) =>
+  item.senderPaymentTransaction.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
 
 
+console.log(filteredTransactions)
 
-const upcomingBookings: TFormattedBooking[] = upcomming?.data?.data?.map((item: TUpcomingBooking) => {
-  const createdDate = new Date(item.createdAt); // ✅ Now inside map, item exists
-  const now = new Date();
-  const timeDiffMs = now.getTime() - createdDate.getTime();
-  const hoursAgo = Math.floor(timeDiffMs / (1000 * 60 * 60));
-
-  return {
-    id: item.id,
-    service: item.title || "Unknown Service",
-    date: item.desireDate,
-    status: item.status,
-    desireDate: `${hoursAgo} hour${hoursAgo !== 1 ? 's' : ''} `,
-    method: "Not Assigned",
-    price: item.price ? `$${item.price}` : "N/A",
-    methodIcon: <Wrench className="w-5 h-5 text-gray-500" />,
-    icon: <Wrench className="w-6 h-6 text-blue-500" />
-  };
-}) ?? [];
-
-
- return (
-
-    <div className=''>
+  return (
+    <div className="">
       <div>
-        <h1 className='px-5'>Booking</h1>
-        <hr className='my-4' />
+        <h1 className="px-5">Booking</h1>
+        <hr className="my-4" />
       </div>
       <div className=" mx-auto   space-y-8 ">
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ">
           {summary.map((item, idx) => (
-            <div key={idx} className="bg-white rounded-lg shadow p-4 items-center space-x-3 ">
-              <div className="bg-gray-100 p-2 w-10  rounded-md">{item.icon}</div>
+            <div
+              key={idx}
+              className="bg-white rounded-lg shadow p-4 items-center space-x-3 "
+            >
+              <div className="bg-gray-100 p-2 w-10  rounded-md">
+                {item.icon}
+              </div>
               <div>
                 <h4 className="text-gray-600">{item.title}</h4>
                 <p className="text-xl font-semibold">{item.value}</p>
@@ -156,69 +113,105 @@ const upcomingBookings: TFormattedBooking[] = upcomming?.data?.data?.map((item: 
 
         {/* Upcoming Bookings */}
         <div>
-          <div className='flex items-center justify-between mx-4'>
-             <h2 className="text-xl font-semibold mb-3">Upcoming Bookings</h2>
-             <h2 className='text-[#F9AA43] text-sm'>View All</h2>
+          <div className="flex items-center justify-between mx-4">
+            <h2 className="text-xl font-semibold mb-3">Upcoming Bookings</h2>
+            <h2 className="text-[#F9AA43] text-sm">View All</h2>
           </div>
-         
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {upcomingBookings.slice(0, 3).map((item: TFormattedBooking, idx: number) => (
-              <div key={idx} className="bg-white p-4 rounded shadow space-y-3">
-                {/* Icon + Service + Date + Status */}
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center gap-2">
-                    {item.icon}
-                    <div>
-                      <h3 className="font-medium text-gray-700">{item.service}</h3>
-                      <p className="text-sm text-gray-500">{item.date}</p>
-                    </div>
-                  </div>
-                  <span
-                    className={`inline-block px-2 py-1 text-xs rounded-full ${item.status === 'Completed'
-                        ? 'bg-green-100 text-green-600'
-                        : item.status === 'Pending'
-                          ? 'bg-yellow-100 text-yellow-600'
-                          : 'bg-red-100 text-red-600'
-                      }`}
-                  >
-                    {item.status}
-                  </span>
-                </div>
 
-                {/* Method + Amount */}
-                <div className="flex justify-between text-sm text-gray-600">
-                  <div className='flex gap-2'>
-                    <span><Clock className="w-4 h-4 text-gray-500" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {upcomming?.data?.data
+              ?.slice(0, 3)
+              .map((item: TFormattedBooking, idx: number) => (
+                <div
+                  key={idx}
+                  className="bg-white p-4 rounded shadow space-y-3"
+                >
+                  {/* Icon + Service + Date + Status */}
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={item.vehicleImage || img}
+                        alt="Vehicle"
+                        className="w-6 h-6 object-cover rounded"
+                      />
+                      <div>
+                        <h3 className="font-medium text-gray-700">
+                          {item.title}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          {new Date(item.createdAt).toLocaleString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                            hour12: true,
+                          })}
+                        </p>
+                      </div>
+                    </div>
+                    <span
+                      className={`inline-block px-2 py-1 text-xs rounded-full ${
+                        item.status === "Completed"
+                          ? "bg-green-100 text-green-600"
+                          : item.status === "Pending"
+                          ? "bg-yellow-100 text-yellow-600"
+                          : "bg-red-100 text-red-600"
+                      }`}
+                    >
+                      {item.status}
                     </span>
-                    <span>{item.desireDate}</span>
                   </div>
-                  <span className="font-semibold text-gray-800">{item.price}</span>
+
+                  {/* Method + Amount */}
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <div className="flex gap-2">
+                      <span>
+                        <Clock className="w-4 h-4  text-gray-500" />
+                      </span>
+                      <span>
+                        {(() => {
+                          const date = new Date(item.desireDate);
+                          const now = new Date();
+                          const diffInMs = now.getTime() - date.getTime();
+                          const hoursAgo = Math.floor(
+                            diffInMs / (1000 * 60 * 60)
+                          );
+                          return `${hoursAgo} hour${
+                            hoursAgo !== 1 ? "s" : ""
+                          } `;
+                        })()}
+                      </span>
+                    </div>
+                    <span className="font-semibold text-gray-800">
+                      {item.price}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
 
-        {/* Transaction History section */ }
-        <div className='my-3'>
-          <div className='flex items-center justify-between mx-3 mb-4'>
-            <h2 className="text-xl font-semibold mb-3">Transaction History</h2> 
-            <div className='flex gap-3'>
+        {/* Transaction History section */}
+        <div className="my-3">
+          <div className="flex items-center justify-between mx-3 mb-4">
+            <h2 className="text-xl font-semibold mb-3">Transaction History</h2>
+            <div className="flex gap-3">
               <div className="max-w-sm w-full relative">
-            <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-            <Input
-              type="text"
-              placeholder="Search transactions..."
-              className="w-full pl-8 " 
-            />
-          </div>
-             <div className='flex items-center gap-2'>
-               <ListFilter className="w-5 h-5 text-gray-600" />
+                <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                <Input
+  type="text"
+  placeholder="Search transactions..."
+  className="w-full pl-8"
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+/>
+              </div>
+              <div className="flex items-center gap-2">
+                <ListFilter className="w-5 h-5 text-gray-600" />
 
-              <p>Filter</p>
-             </div>
+                <p>Filter</p>
+              </div>
             </div>
-
           </div>
           <div className="overflow-auto rounded-lg shadow">
             <table className="min-w-full bg-white">
@@ -233,30 +226,35 @@ const upcomingBookings: TFormattedBooking[] = upcomming?.data?.data?.map((item: 
                 </tr>
               </thead>
               <tbody>
-                {transactions.map((item, idx) => (
-                  <tr key={idx} className="border-t">
-                    <td className="py-2 px-4">{item.id}</td>
-                    <td className="py-2 px-4">{item.service}</td>
-                    <td className="py-2 px-4">{item.date}</td>
+                {filteredTransactions?.map((item: TTransactionItem) => (
+                  <tr key={item.id} className="border-t">
+                    <td className="py-2 px-4">{item.senderPaymentTransaction}</td>
+                    <td className="py-2 px-4">{item.serviceTitle}</td>
+                    <td className="py-2 px-4">
+                      {new Date(item.updatedAt).toLocaleString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </td>
+
                     <td className="py-2 px-4">{item.amount}</td>
                     <td className="py-2 px-4">
                       <span
-                        className={`px-2 py-1 text-xs rounded-full ${item.status === 'Completed'
-                            ? 'bg-green-100 text-green-600'
-                            : item.status === 'Pending'
-                              ? 'bg-yellow-100 text-yellow-600'
-                              : 'bg-red-100 text-red-600'
-                          }`}
+                        className={`px-2 py-1 text-xs rounded-full ${
+                          item.status === "Completed"
+                            ? "bg-green-100 text-green-600"
+                            : item.status === "Pending"
+                            ? "bg-yellow-100 text-yellow-600"
+                            : "bg-red-100 text-red-600"
+                        }`}
                       >
                         {item.status}
                       </span>
                     </td>
                     <td className="py-2 px-4">
-
-                      <div className='flex gap-5 items-center'>
-                        {
-                          item.methodIcon
-                        }
+                      <div className="flex gap-5 items-center">
+                        {item.methodIcon}
                         {item.method}
                       </div>
                     </td>
