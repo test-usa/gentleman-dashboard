@@ -1,3 +1,4 @@
+import { useGetServiceListingQuery } from "@/Redux/features/dashboard/Utilisateurs/getServiceListingApi";
 import { useMemo, useState } from "react";
 import { FaChevronLeft, FaChevronRight, FaEdit, FaEye, FaFilter, FaPlus, FaTimes, FaTrashAlt } from "react-icons/fa";
 
@@ -198,6 +199,12 @@ const Utilisateurs = () => {
   const handleView = (id: any) => console.log("View service:", id);
   const handleDelete = (id: any) => console.log("Delete service:", id);
   const handleAddNewService = () => console.log("Add New Service clicked");
+
+
+
+
+  const {data}=useGetServiceListingQuery(undefined)
+  console.log(data)
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 font-sans sm:p-6">
