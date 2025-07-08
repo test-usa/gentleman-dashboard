@@ -110,17 +110,26 @@ const History = () => {
 })) ?? [];
 
 
-const upcomingBookings: TFormattedBooking[] = upcomming?.data?.data?.map((item: TUpcomingBooking) => ({
-  id: item.id,
-  service: item.title || "Unknown Service",
-  date: new Date(item.createdAt).toLocaleDateString(),
-  status: item.status,
-  desireDate:item.desireDate,
-  method: "Not Assigned",
-  price: item.price ? `$${item.price}` : "N/A",
-  methodIcon: <Wrench className="w-5 h-5 text-gray-500" />,
-  icon: <Wrench className="w-6 h-6 text-blue-500" />
-})) ?? [];
+
+
+const upcomingBookings: TFormattedBooking[] = upcomming?.data?.data?.map((item: TUpcomingBooking) => {
+  const createdDate = new Date(item.createdAt); // ✅ Now inside map, item exists
+  const now = new Date();
+  const timeDiffMs = now.getTime() - createdDate.getTime();
+  const hoursAgo = Math.floor(timeDiffMs / (1000 * 60 * 60));
+
+  return {
+    id: item.id,
+    service: item.title || "Unknown Service",
+    date: item.desireDate,
+    status: item.status,
+    desireDate: `${hoursAgo} hour${hoursAgo !== 1 ? 's' : ''} `,
+    method: "Not Assigned",
+    price: item.price ? `$${item.price}` : "N/A",
+    methodIcon: <Wrench className="w-5 h-5 text-gray-500" />,
+    icon: <Wrench className="w-6 h-6 text-blue-500" />
+  };
+}) ?? [];
 
 
  return (
