@@ -1,5 +1,7 @@
 
 
+import { useGetMetaDataQuery } from "@/Redux/features/dashboard/dashboard/metadataApi";
+import { useGetMonthlyStatusQuery } from "@/Redux/features/dashboard/dashboard/monthlyStatus";
 import {
   LineChart,
   Line,
@@ -38,15 +40,7 @@ const Badge = ({
   </span>
 )
 
-// Sample data for charts
-const monthlyReservations = [
-  { month: "Jan", value: 65 },
-  { month: "Fév", value: 75 },
-  { month: "Mar", value: 85 },
-  { month: "Avr", value: 78 },
-  { month: "Mai", value: 88 },
-  { month: "Juin", value: 92 },
-]
+
 
 const serviceDistribution = [
   { name: "Réparation", value: 40, color: "#3B82F6" },
@@ -90,9 +84,42 @@ const recentActivities = [
   },
 ]
 
+
+type DashboardMetrics = {
+  activeUsers: number;
+  bookingsToday: number;
+  monthlyRevenue: number;
+  verifiedProfessionals: number;
+};
+
+type monthlyType={
+  month:string;
+  count:number;
+}
+
+
 export default function Home() {
   // Removed selectedPeriod since it's unused; if you want to keep it, just remove the comment
   // const [selectedPeriod, setSelectedPeriod] = useState("monthly")
+
+   const {data:monthlyStatus}=useGetMonthlyStatusQuery(undefined)
+   
+
+   const month = monthlyStatus?.data?.map((item:monthlyType) => ({
+  month: item.month,
+  value: item.count,
+}));
+
+console.log(month)
+
+  const {data}=useGetMetaDataQuery(undefined)
+   if (!data) {
+    return <div>Loading...</div>;  // Or spinner, skeleton etc.
+  }
+   const { activeUsers, bookingsToday, monthlyRevenue, verifiedProfessionals } = data?.data as DashboardMetrics;
+
+
+  
 
   return (
     <div className="min-h-screen  ">
@@ -104,7 +131,7 @@ export default function Home() {
               <div className="space-y-2">
                 <p className="text-sm font-medium text-gray-600">Utilisateurs actifs</p>
                 <div className="flex items-baseline space-x-2 justify-between">
-                  <p className="text-2xl font-bold text-gray-900">12,458</p>
+                  <p className="text-2xl font-bold text-gray-900">{activeUsers}</p>
                   <span className="text-sm font-medium text-green-600">+12%</span>
                 </div>
               </div>
@@ -116,7 +143,7 @@ export default function Home() {
               <div className="space-y-2">
                 <p className="text-sm font-medium text-gray-600">Professionnels vérifiés</p>
                 <div className="flex items-baseline space-x-2 justify-between">
-                  <p className="text-2xl font-bold text-gray-900">842</p>
+                  <p className="text-2xl font-bold text-gray-900">{verifiedProfessionals}</p>
                   <span className="text-sm font-medium text-green-600">+5%</span>
                 </div>
               </div>
@@ -128,7 +155,7 @@ export default function Home() {
               <div className="space-y-2">
                 <p className="text-sm font-medium text-gray-600">Réservations du jour</p>
                 <div className="flex items-baseline space-x-2 justify-between">
-                  <p className="text-2xl font-bold text-gray-900">156</p>
+                  <p className="text-2xl font-bold text-gray-900">{bookingsToday}</p>
                   <span className="text-sm font-medium text-green-600">+8%</span>
                 </div>
               </div>
@@ -140,7 +167,7 @@ export default function Home() {
               <div className="space-y-2">
                 <p className="text-sm font-medium text-gray-600">Revenu mensuel</p>
                 <div className="flex items-baseline space-x-2 justify-between">
-                  <p className="text-2xl font-bold text-gray-900">45,890 €</p>
+                  <p className="text-2xl font-bold text-gray-900">{monthlyRevenue}</p>
                   <span className="text-sm font-medium text-green-600">+15%</span>
                 </div>
               </div>
@@ -158,7 +185,7 @@ export default function Home() {
             <CardContent className="p-4">
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={monthlyReservations}>
+                  <LineChart data={month}>
                     <XAxis
                       dataKey="month"
                       // axisLine={true} // this is the default, so you can omit this line altogether
