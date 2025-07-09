@@ -7,7 +7,6 @@ import {
   FaEye,
   FaFilter,
   FaPlus,
-  FaTimes,
   FaTrashAlt,
 } from "react-icons/fa";
 
@@ -29,7 +28,8 @@ const Utilisateurs = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const { data } = useGetServiceListingQuery(currentPage);
-  console.log(data)
+
+
 
   const [filters, setFilters] = useState({
     status: "",
@@ -69,14 +69,19 @@ const Utilisateurs = () => {
 
   // Filtered data from API response (optional for client-side filtering)
   const filteredServices = useMemo(() => {
-    return data?.data?.filter((service: ProviderSummary) => {
-      return (
-        (filters.status === "" || service.status === filters.status) &&
-        (filters.category === "" || service.serviceCategoryId.includes(filters.category)) &&
-        (filters.location === "" || (service.country || "").includes(filters.location)) &&
-        (filters.dateRange === "" || service.createdAt.startsWith(filters.dateRange))
-      );
-    }) || [];
+    return (
+      data?.data?.filter((service: ProviderSummary) => {
+        return (
+          (filters.status === "" || service.status === filters.status) &&
+          (filters.category === "" ||
+            service.serviceCategoryId.includes(filters.category)) &&
+          (filters.location === "" ||
+            (service.country || "").includes(filters.location)) &&
+          (filters.dateRange === "" ||
+            service.createdAt.startsWith(filters.dateRange))
+        );
+      }) || []
+    );
   }, [data, filters]);
 
   const totalItems = data?.total || 0;
@@ -91,39 +96,43 @@ const Utilisateurs = () => {
     }
   };
 
- const uniqueCategories = useMemo(() => {
-  const categories = (data?.data as ProviderSummary[])?.map(
-    (s) => s.serviceCategoryId
-  ) || [];
-  return [...new Set(categories)];
-}, [data]);
+  const uniqueCategories = useMemo(() => {
+    const categories =
+      (data?.data as ProviderSummary[])?.map((s) => s.serviceCategoryId) || [];
+    return [...new Set(categories)];
+  }, [data]);
 
-const uniqueLocations = useMemo(() => {
-  const locations = (data?.data as ProviderSummary[])?.map(
-    (s) => s.country || "Unknown"
-  ) || [];
-  return [...new Set(locations)];
-}, [data]);
+  const uniqueLocations = useMemo(() => {
+    const locations =
+      (data?.data as ProviderSummary[])?.map((s) => s.country || "Unknown") ||
+      [];
+    return [...new Set(locations)];
+  }, [data]);
 
-const uniqueStatuses = useMemo(() => {
-  const statuses = (data?.data as ProviderSummary[])?.map(
-    (s) => s.status||"approved"||"confirmed"
-  ) || [];
-  return [...new Set(statuses)];
-}, [data]);
-
+  const uniqueStatuses = useMemo(() => {
+    const statuses =
+      (data?.data as ProviderSummary[])?.map(
+        (s) => s.status || "approved" || "confirmed"
+      ) || [];
+    return [...new Set(statuses)];
+  }, [data]);
 
   const handleEdit = (id: any) => console.log("Edit service:", id);
   const handleView = (id: any) => console.log("View service:", id);
   const handleDelete = (id: any) => console.log("Delete service:", id);
   const handleAddNewService = () => console.log("Add New Service clicked");
+  if (!data) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 font-sans sm:p-6">
       <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <h1 className="text-2xl font-semibold text-gray-800">Service Listings</h1>
+        <h1 className="text-2xl font-semibold text-gray-800">
+          Service Listings
+        </h1>
         <button
-          className="bg-[#F9AA43] flex gap-2 items-center justify-center p-2 px-4 rounded-xl text-white"
+          className="bg-[#F9AA43] flex gap-2 cursor-pointer items-center justify-center p-2 px-4 rounded-xl text-white"
           onClick={handleAddNewService}
         >
           <FaPlus /> Add New Service
@@ -143,12 +152,12 @@ const uniqueStatuses = useMemo(() => {
             onChange={handleFilterChange}
             className="block w-full rounded-md border border-gray-300 py-2 pl-3 pr-10 text-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           >
-             <option value="">Status</option>
-  {uniqueStatuses.map((status) => (
-    <option key={String(status)} value={String(status)}>
-      {String(status)}
-    </option>
-  ))}
+            <option value="">Status</option>
+            {uniqueStatuses.map((status) => (
+              <option key={String(status)} value={String(status)}>
+                {String(status)}
+              </option>
+            ))}
           </select>
 
           <select
@@ -158,11 +167,11 @@ const uniqueStatuses = useMemo(() => {
             className="block w-full rounded-md border border-gray-300 py-2 pl-3 pr-10 text-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           >
             <option value="">Category</option>
-  {uniqueCategories.map((category) => (
-    <option key={String(category)} value={String(category)}>
-      {String(category)}
-    </option>
-  ))}
+            {uniqueCategories.map((category) => (
+              <option key={String(category)} value={String(category)}>
+                {String(category)}
+              </option>
+            ))}
           </select>
 
           <select
@@ -172,11 +181,11 @@ const uniqueStatuses = useMemo(() => {
             className="block w-full rounded-md border border-gray-300 py-2 pl-3 pr-10 text-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           >
             <option value="">Location</option>
-  {uniqueLocations.map((location) => (
-    <option key={String(location)} value={String(location)}>
-      {String(location)}
-    </option>
-  ))}
+            {uniqueLocations.map((location) => (
+              <option key={String(location)} value={String(location)}>
+                {String(location)}
+              </option>
+            ))}
           </select>
 
           <input
@@ -187,8 +196,13 @@ const uniqueStatuses = useMemo(() => {
             className="block w-full rounded-md border border-gray-300 py-2 pl-3 pr-3 text-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           />
 
-          <button onClick={handleClearFilters} className="w-full justify-center lg:col-span-1">
-            <FaTimes className="size-3" /> Clear Filters
+          <button
+            onClick={handleClearFilters}
+            className="w-full justify-center lg:col-span-1"
+          >
+            <span className="text-yellow-600 cursor-pointer">
+              Clear Filters
+            </span>
           </button>
         </div>
       </div>
@@ -227,7 +241,9 @@ const uniqueStatuses = useMemo(() => {
                 <tr key={service.id}>
                   <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-900">
                     <div className="font-medium">{service.workShopName}</div>
-                    <div className="text-gray-500">{service.serviceCategoryId}</div>
+                    <div className="text-gray-500">
+                      {service.serviceCategoryId}
+                    </div>
                   </td>
                   <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-900">
                     {service.name}
@@ -252,13 +268,22 @@ const uniqueStatuses = useMemo(() => {
                   </td>
                   <td className="whitespace-nowrap px-4 py-4 text-sm font-medium">
                     <div className="flex items-center gap-2">
-                      <button onClick={() => handleEdit(service.id)} title="Edit">
+                      <button
+                        onClick={() => handleEdit(service.id)}
+                        title="Edit"
+                      >
                         <FaEdit className="size-4 text-blue-500" />
                       </button>
-                      <button onClick={() => handleView(service.id)} title="View">
+                      <button
+                        onClick={() => handleView(service.id)}
+                        title="View"
+                      >
                         <FaEye className="size-4 text-gray-500" />
                       </button>
-                      <button onClick={() => handleDelete(service.id)} title="Delete">
+                      <button
+                        onClick={() => handleDelete(service.id)}
+                        title="Delete"
+                      >
                         <FaTrashAlt className="size-4 text-red-500" />
                       </button>
                     </div>
@@ -308,7 +333,7 @@ const uniqueStatuses = useMemo(() => {
           <button
             onClick={() => paginate(currentPage - 1)}
             disabled={currentPage === 1}
-            className="rounded-l-md px-2 py-1 border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="rounded-l-md px-2 py-1 border cursor-pointer border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
           >
             <FaChevronLeft className="size-3" />
           </button>
@@ -317,7 +342,7 @@ const uniqueStatuses = useMemo(() => {
             <button
               key={page}
               onClick={() => paginate(page)}
-              className={`relative z-10 px-2 py-1 border text-sm ${
+              className={`relative z-10 px-2 py-1 border cursor-pointer text-sm ${
                 currentPage === page
                   ? "bg-[#F9AA43] text-white border-[#F9AA43]"
                   : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
@@ -330,7 +355,7 @@ const uniqueStatuses = useMemo(() => {
           <button
             onClick={() => paginate(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="rounded-r-md px-2 py-1 border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="rounded-r-md px-2 py-1 border border-gray-300 bg-white text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 cursor-pointer"
           >
             <FaChevronRight className="size-3" />
           </button>

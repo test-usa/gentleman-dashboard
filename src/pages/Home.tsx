@@ -2,6 +2,7 @@
 
 import { useGetMetaDataQuery } from "@/Redux/features/dashboard/dashboard/metadataApi";
 import { useGetMonthlyStatusQuery } from "@/Redux/features/dashboard/dashboard/monthlyStatus";
+import { useGetPiChartQuery } from "@/Redux/features/dashboard/dashboard/pieChart";
 import {
   LineChart,
   Line,
@@ -102,6 +103,9 @@ export default function Home() {
   // Removed selectedPeriod since it's unused; if you want to keep it, just remove the comment
   // const [selectedPeriod, setSelectedPeriod] = useState("monthly")
 
+  const{data:piChart}=useGetPiChartQuery(undefined)
+  console.log(piChart)
+
    const {data:monthlyStatus}=useGetMonthlyStatusQuery(undefined)
    
 
@@ -110,7 +114,7 @@ export default function Home() {
   value: item.count,
 }));
 
-console.log(month)
+
 
   const {data}=useGetMetaDataQuery(undefined)
    if (!data) {
