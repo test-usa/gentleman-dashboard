@@ -15,6 +15,7 @@ import {
   Cell,
 } from "recharts";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 // Dummy UI components with Tailwind styles
 const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
@@ -75,7 +76,7 @@ export default function Home() {
   const { data: reportsData, isLoading } = useGetReportsQuery({ currentPage, limit: itemsPerPage });
 
   if (!data) {
-    return <div>Loading...</div>;
+    return <div><LoadingSpinner></LoadingSpinner></div>;
   }
 
   const { activeUsers, bookingsToday, monthlyRevenue, verifiedProfessionals } =
