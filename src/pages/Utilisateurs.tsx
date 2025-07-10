@@ -1,3 +1,4 @@
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useGetServiceListingQuery } from "@/Redux/features/dashboard/Utilisateurs/getServiceListingApi";
 import { useMemo, useState } from "react";
 import {
@@ -122,7 +123,7 @@ const Utilisateurs = () => {
   const handleDelete = (id: any) => console.log("Delete service:", id);
   const handleAddNewService = () => console.log("Add New Service clicked");
   if (!data) {
-    return <div>Loading...</div>;
+    return <div><LoadingSpinner></LoadingSpinner></div>;
   }
 
   return (

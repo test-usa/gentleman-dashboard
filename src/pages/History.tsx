@@ -15,6 +15,7 @@ import {
 
 import { useState, type JSX, type ReactNode } from "react";
 import { MdSearch } from "react-icons/md";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 type TFormattedBooking = {
   id: string;
@@ -50,7 +51,7 @@ const History = () => {
   const [showAllBookings, setShowAllBookings] = useState(false);
 
   if (!data || !transtion || !upcomming) {
-    return <div>Loading...</div>;
+    return <div><LoadingSpinner></LoadingSpinner></div>;
   }
 
   const summary = [
