@@ -83,7 +83,8 @@ export const baseApi=createApi({
             baseQuery:baseQueryWithRefreshToken,
 
             endpoints:()=>({}),
-            tagTypes: ['Services'],
+            tagTypes: ['Services',"Categories"],
+            
             
 
 })

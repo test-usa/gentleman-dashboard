@@ -6,8 +6,7 @@ export const servicesApi = baseApi.injectEndpoints({
       query: (formData) => ({
         url: "/services",
         method: "POST",
-        body: formData,  // Pass FormData directly
-        // Do NOT set headers here — fetch will set correct multipart/form-data headers automatically
+        body: formData,  
       }),
       invalidatesTags: ["Services"],
     }),
