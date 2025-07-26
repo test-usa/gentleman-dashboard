@@ -7,6 +7,9 @@ import History from "@/pages/History";
 import Error from "@/Error/Error";
 import Signup from "@/pages/Signup";
 import Login from "@/pages/Login";
+import Services from "@/pages/Services";
+import Categories from "@/pages/Categories";
+
 
 const AppRoutes = () => {
   return (
@@ -21,6 +24,8 @@ const AppRoutes = () => {
         <Route path="utilisateurs" element={<Utilisateurs />} />
         <Route path="history" element={<History />} />
         <Route path="request" element={<Request />} />
+        <Route path="service" element={<Services/>} />
+        <Route path="categories" element={<Categories />} />
         <Route path="*" element={<Error />} /> {/* Catch-all route */}
       </Route>
     </Routes>
