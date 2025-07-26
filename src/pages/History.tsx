@@ -47,6 +47,9 @@ const History = () => {
   const { data: transtion } = useGetTranstionIdQuery(undefined);
   const { data: upcomming } = useGetUpCommingQuery(undefined);
 
+
+  console.log("data:",data,     "transtion:",transtion,    "upcoming:", upcomming)
+
   const [searchTerm, setSearchTerm] = useState("");
   const [showAllBookings, setShowAllBookings] = useState(false);
 

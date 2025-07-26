@@ -35,7 +35,7 @@ import type {
 import { setUser } from "../features/auth/authSlice";
 import type { RootState } from "../store";
 
-const baseQuery=fetchBaseQuery({baseUrl:'https://gentleman-backend-2.onrender.com/api/v1',
+const baseQuery=fetchBaseQuery({baseUrl:'https://freepik.softvenceomega.com/gntl/v1',
 
             // credentials:'include',
             prepareHeaders: (headers, { getState }) => {
@@ -56,7 +56,7 @@ const baseQueryWithRefreshToken:BaseQueryFn<FetchArgs,BaseQueryApi,DefinitionTyp
             if (result?.error?.status === 401) {
                 console.log("sending refresh token");
         
-                const res = await fetch("https://gentleman-backend-2.onrender.com/api/v1/auth/refresh-token", {
+                const res = await fetch("https://freepik.softvenceomega.com/gntl/v1/auth/refresh-token", {
                     method: "POST",
                     credentials: "include",
                 });
