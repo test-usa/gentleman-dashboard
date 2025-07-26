@@ -71,6 +71,8 @@ export default function Home() {
   const { data: monthlyStatus } = useGetMonthlyStatusQuery(undefined);
   const { data } = useGetMetaDataQuery(undefined);
 
+    console.log("piechart:", piChart,  "monthlyStatus:", monthlyStatus, "data:",data)
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const { data: reportsData, isLoading } = useGetReportsQuery({ currentPage, limit: itemsPerPage });

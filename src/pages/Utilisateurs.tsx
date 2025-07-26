@@ -29,6 +29,7 @@ const Utilisateurs = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const { data } = useGetServiceListingQuery(currentPage);
+  console.log(data)
 
 
 
