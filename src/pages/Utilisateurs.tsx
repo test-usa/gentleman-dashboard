@@ -1,6 +1,9 @@
+import LocationCell from "@/components/LocationCell";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { useGetServiceListingQuery } from "@/Redux/features/dashboard/Utilisateurs/getServiceListingApi";
 import { useMemo, useState } from "react";
+
+
 import {
   FaChevronLeft,
   FaChevronRight,
@@ -22,6 +25,9 @@ export interface ProviderSummary {
   createdAt: string;
   updatedAt: string;
   id: string;
+  latitude:string;
+  longitude:string;
+
 }
 
 const Utilisateurs = () => {
@@ -254,7 +260,7 @@ const Utilisateurs = () => {
                     {service.serviceCategoryId}
                   </td>
                   <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-900">
-                    {service.country}
+                     <LocationCell latitude={service.latitude} longitude={service.longitude} />
                   </td>
                   <td className="whitespace-nowrap px-4 py-4">
                     <span
