@@ -77,6 +77,8 @@ export default function Home() {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const { data: reportsData, isLoading } = useGetReportsQuery({ currentPage, limit: itemsPerPage });
 
+  console.log(reportsData)
+
   if (!data) {
     return <div><LoadingSpinner></LoadingSpinner></div>;
   }
