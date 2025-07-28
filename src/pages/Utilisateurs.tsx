@@ -27,6 +27,7 @@ export interface ProviderSummary {
   id: string;
   latitude:string;
   longitude:string;
+  specialist:string;
 
 }
 
@@ -257,7 +258,7 @@ const Utilisateurs = () => {
                     {service.name}
                   </td>
                   <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-900">
-                    {service.serviceCategoryId}
+                    {service.specialist}
                   </td>
                   <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-900">
                      <LocationCell latitude={service.latitude} longitude={service.longitude} />
