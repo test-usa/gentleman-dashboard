@@ -189,7 +189,7 @@ export default function Home() {
       {/* Recent Activity Table */}
       <Card>
         <CardHeader className="p-4 border-b border-gray-200">
-          <CardTitle>Recent Activity</CardTitle>
+          <CardTitle>Activité récente</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
           <div className="overflow-x-auto">
