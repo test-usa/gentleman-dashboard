@@ -43,18 +43,67 @@ interface TTransactionItem {
 }
 
 const History = () => {
-  const { data } = useGetPaymentAndBookingQuery(undefined);
-  const { data: transtion } = useGetTranstionIdQuery(undefined);
-  const { data: upcomming } = useGetUpCommingQuery(undefined);
 
-
-  console.log("data:",data,     "transtion:",transtion,    "upcoming:", upcomming)
 
   const [searchTerm, setSearchTerm] = useState("");
   const [showAllBookings, setShowAllBookings] = useState(false);
 
+const demoTransactions: TTransactionItem[] = [
+  {
+    id: "demo1",
+    senderPaymentTransaction: "TXN123456",
+    serviceTitle: "Demo Service 1",
+    updatedAt: new Date().toISOString(),
+    amount: "$100",
+    status: "Completed",
+    method: "Credit Card",
+    methodIcon: <DollarSign className="w-4 h-4 text-gray-600" />,
+    icon: <CheckCircle />,
+  },
+  {
+    id: "demo2",
+    senderPaymentTransaction: "TXN789101",
+    serviceTitle: "Demo Service 2",
+    updatedAt: new Date().toISOString(),
+    amount: "$200",
+    status: "Pending",
+    method: "PayPal",
+    methodIcon: <DollarSign className="w-4 h-4 text-gray-600" />,
+    icon: <Clock />,
+  },
+  
+];
+
+
+
+
+
+  const { data } = useGetPaymentAndBookingQuery(undefined);
+  const { data: transtion } = useGetTranstionIdQuery(undefined);
+  const { data: upcomming } = useGetUpCommingQuery(undefined);
+
+  console.log("data:", data, "transtion:", transtion, "upcoming:", upcomming);
+
+
+
+  const transactionsToDisplay = (transtion?.data && transtion.data.length > 0)
+  ? transtion.data.filter((item: TTransactionItem) =>
+      item.senderPaymentTransaction.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  : demoTransactions.filter((item) =>
+      item.senderPaymentTransaction.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+
+
+
+
   if (!data || !transtion || !upcomming) {
-    return <div><LoadingSpinner></LoadingSpinner></div>;
+    return (
+      <div>
+        <LoadingSpinner></LoadingSpinner>
+      </div>
+    );
   }
 
   const summary = [
@@ -84,12 +133,7 @@ const History = () => {
     },
   ];
 
-  const filteredTransactions = transtion?.data?.filter(
-    (item: TTransactionItem) =>
-      item.senderPaymentTransaction
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase())
-  );
+ 
 
   const bookings = showAllBookings
     ? upcomming?.data?.data || []
@@ -98,7 +142,7 @@ const History = () => {
   return (
     <div className="">
       <div>
-        <h1 className="px-5">Booking</h1>
+        <h1 className="text-xl font-semibold px-5">Booking</h1>
         <hr className="my-4" />
       </div>
 
@@ -122,16 +166,15 @@ const History = () => {
 
         {/* Upcoming Bookings */}
         <div>
-         <div className="flex items-center justify-between mx-4">
-  <h2 className="text-xl font-semibold mb-3">Upcoming Bookings</h2>
-  <button
-    onClick={() => setShowAllBookings(!showAllBookings)}
-    className="text-[#F9AA43] text-sm  cursor-pointer"
-  >
-    {showAllBookings ? "Show Less" : "View All"}
-  </button>
-</div>
-
+          <div className="flex items-center justify-between mx-4">
+            <h2 className="text-xl font-semibold mb-3">Upcoming Bookings</h2>
+            <button
+              onClick={() => setShowAllBookings(!showAllBookings)}
+              className="text-[#F9AA43] text-sm  cursor-pointer"
+            >
+              {showAllBookings ? "Show Less" : "View All"}
+            </button>
+          </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {bookings.map((item: TFormattedBooking, idx: number) => (
@@ -179,7 +222,9 @@ const History = () => {
                         const date = new Date(item.desireDate);
                         const now = new Date();
                         const diffInMs = now.getTime() - date.getTime();
-                        const hoursAgo = Math.floor(diffInMs / (1000 * 60 * 60));
+                        const hoursAgo = Math.floor(
+                          diffInMs / (1000 * 60 * 60)
+                        );
                         return `${hoursAgo} hour${
                           hoursAgo !== 1 ? "s" : ""
                         } ago`;
@@ -229,43 +274,42 @@ const History = () => {
                   <th className="py-2 px-4 text-left">Payment Method</th>
                 </tr>
               </thead>
-              <tbody>
-                {filteredTransactions?.map((item: TTransactionItem) => (
-                  <tr key={item.id} className="border-t">
-                    <td className="py-2 px-4">
-                      {item.senderPaymentTransaction}
-                    </td>
-                    <td className="py-2 px-4">{item.serviceTitle}</td>
-                    <td className="py-2 px-4">
-                      {new Date(item.updatedAt).toLocaleString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </td>
-                    <td className="py-2 px-4">{item.amount}</td>
-                    <td className="py-2 px-4">
-                      <span
-                        className={`px-2 py-1 text-xs rounded-full ${
-                          item.status === "Completed"
-                            ? "bg-green-100 text-green-600"
-                            : item.status === "Pending"
-                            ? "bg-yellow-100 text-yellow-600"
-                            : "bg-red-100 text-red-600"
-                        }`}
-                      >
-                        {item.status}
-                      </span>
-                    </td>
-                    <td className="py-2 px-4">
-                      <div className="flex gap-5 items-center">
-                        {item.methodIcon}
-                        {item.method}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+             <tbody>
+  {transactionsToDisplay.map((item: TTransactionItem) => (
+    <tr key={item.id} className="border-t">
+      <td className="py-2 px-4">{item.senderPaymentTransaction}</td>
+      <td className="py-2 px-4">{item.serviceTitle}</td>
+      <td className="py-2 px-4">
+        {new Date(item.updatedAt).toLocaleString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })}
+      </td>
+      <td className="py-2 px-4">{item.amount}</td>
+      <td className="py-2 px-4">
+        <span
+          className={`px-2 py-1 text-xs rounded-full ${
+            item.status === "Completed"
+              ? "bg-green-100 text-green-600"
+              : item.status === "Pending"
+              ? "bg-yellow-100 text-yellow-600"
+              : "bg-red-100 text-red-600"
+          }`}
+        >
+          {item.status}
+        </span>
+      </td>
+      <td className="py-2 px-4">
+        <div className="flex gap-5 items-center">
+          {item.methodIcon}
+          {item.method}
+        </div>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
             </table>
           </div>
         </div>
