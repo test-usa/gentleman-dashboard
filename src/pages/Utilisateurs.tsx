@@ -1,7 +1,10 @@
 import LocationCell from "@/components/LocationCell";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { useDeleteUserMutation } from "@/Redux/features/dashboard/Utilisateurs/deleteUserApi";
 import { useGetServiceListingQuery } from "@/Redux/features/dashboard/Utilisateurs/getServiceListingApi";
 import { useMemo, useState } from "react";
+
+import Swal from "sweetalert2";
 
 
 import {
@@ -13,6 +16,7 @@ import {
   FaPlus,
   FaTrashAlt,
 } from "react-icons/fa";
+import { useUpdateUserMutation } from "@/Redux/features/dashboard/Utilisateurs/updateUserApi";
 
 export interface ProviderSummary {
   status: string;
@@ -35,8 +39,15 @@ const Utilisateurs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const { data } = useGetServiceListingQuery(currentPage);
-  console.log(data)
+  const { data,refetch  } = useGetServiceListingQuery(currentPage);
+  // console.log(data)
+const [deleteuser] = useDeleteUserMutation();
+
+console.log(deleteuser)
+
+const [updateUser] = useUpdateUserMutation();
+
+console.log(updateUser)
 
 
 
@@ -126,9 +137,60 @@ const Utilisateurs = () => {
     return [...new Set(statuses)];
   }, [data]);
 
-  const handleEdit = (id: any) => console.log("Edit service:", id);
+
+
+const handleEdit = async (id: string) => {
+  const { value: status } = await Swal.fire({
+    title: 'Enter new status',
+    input: 'text',
+    inputPlaceholder: 'Type any status here',
+    showCancelButton: true,
+  });
+
+  if (status) {
+    try {
+      await updateUser({ id, data: { status } }).unwrap();
+      Swal.fire('Updated!', `Status has been updated to "${status}".`, 'success');
+      refetch();
+    } catch (error) {
+      Swal.fire('Error!', 'Failed to update status.', 'error');
+      console.error('Update error:', error);
+    }
+  }
+};
+
+
+
+
   const handleView = (id: any) => console.log("View service:", id);
-  const handleDelete = (id: any) => console.log("Delete service:", id);
+
+
+ const handleDelete = async (id: string) => {
+  const result = await Swal.fire({
+    title: "Are you sure?",
+    text: "Do you want to delete this service?",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete it!",
+  });
+
+  if (result.isConfirmed) {
+    try {
+      await deleteuser(id).unwrap();
+      Swal.fire("Deleted!", "The service has been deleted.", "success");
+       refetch();
+    } catch (error) {
+      Swal.fire("Error!", "Failed to delete the service.", "error");
+      console.error("Delete error:", error);
+    }
+  }
+};
+
+
+
+
   const handleAddNewService = () => console.log("Add New Service clicked");
   if (!data) {
     return <div><LoadingSpinner></LoadingSpinner></div>;
