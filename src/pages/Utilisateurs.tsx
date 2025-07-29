@@ -83,9 +83,9 @@ const Utilisateurs = () => {
         return (
           (filters.status === "" || service.status === filters.status) &&
           (filters.category === "" ||
-            service.serviceCategoryId.includes(filters.category)) &&
+            service.specialist.includes(filters.category)) &&
           (filters.location === "" ||
-            (service.country || "").includes(filters.location)) &&
+            (service.latitude && service.longitude || "").includes(filters.location)) &&
           (filters.dateRange === "" ||
             service.createdAt.startsWith(filters.dateRange))
         );
@@ -107,13 +107,13 @@ const Utilisateurs = () => {
 
   const uniqueCategories = useMemo(() => {
     const categories =
-      (data?.data as ProviderSummary[])?.map((s) => s.serviceCategoryId) || [];
+      (data?.data as ProviderSummary[])?.map((s) => s.specialist) || [];
     return [...new Set(categories)];
   }, [data]);
 
   const uniqueLocations = useMemo(() => {
     const locations =
-      (data?.data as ProviderSummary[])?.map((s) => s.country || "Unknown") ||
+      (data?.data as ProviderSummary[])?.map((s) => s.latitude && s.longitude || "Unknown") ||
       [];
     return [...new Set(locations)];
   }, [data]);
