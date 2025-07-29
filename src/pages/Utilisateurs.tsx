@@ -6,7 +6,6 @@ import { useMemo, useState } from "react";
 
 import Swal from "sweetalert2";
 
-
 import {
   FaChevronLeft,
   FaChevronRight,
@@ -29,27 +28,19 @@ export interface ProviderSummary {
   createdAt: string;
   updatedAt: string;
   id: string;
-  latitude:string;
-  longitude:string;
-  specialist:string;
-
+  latitude: string;
+  longitude: string;
+  specialist: string;
 }
 
 const Utilisateurs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const { data,refetch  } = useGetServiceListingQuery(currentPage);
-  // console.log(data)
-const [deleteuser] = useDeleteUserMutation();
+  const { data, refetch } = useGetServiceListingQuery(currentPage);
 
-console.log(deleteuser)
-
-const [updateUser] = useUpdateUserMutation();
-
-console.log(updateUser)
-
-
+  const [deleteuser] = useDeleteUserMutation();
+  const [updateUser] = useUpdateUserMutation();
 
   const [filters, setFilters] = useState({
     status: "",
@@ -61,7 +52,7 @@ console.log(updateUser)
   const handleFilterChange = (e: any) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
-    setCurrentPage(1); // Reset page on filter
+    setCurrentPage(1);
   };
 
   const handleClearFilters = () => {
@@ -87,7 +78,6 @@ console.log(updateUser)
     }
   };
 
-  // Filtered data from API response (optional for client-side filtering)
   const filteredServices = useMemo(() => {
     return (
       data?.data?.filter((service: ProviderSummary) => {
@@ -124,7 +114,7 @@ console.log(updateUser)
 
   const uniqueLocations = useMemo(() => {
     const locations =
-      (data?.data as ProviderSummary[])?.map((s) => s.latitude && s.longitude || "Unknown") ||
+      (data?.data as ProviderSummary[])?.map((s) => s.latitude && s.longitude || "Inconnu") ||
       [];
     return [...new Set(locations)];
   }, [data]);
@@ -132,89 +122,79 @@ console.log(updateUser)
   const uniqueStatuses = useMemo(() => {
     const statuses =
       (data?.data as ProviderSummary[])?.map(
-        (s) => s.status || "approved" || "confirmed"
+        (s) => s.status || "Approuvé" || "Confirmé"
       ) || [];
     return [...new Set(statuses)];
   }, [data]);
 
+  const handleEdit = async (id: string) => {
+    const { value: status } = await Swal.fire({
+      title: "Entrer le nouveau statut",
+      input: "text",
+      inputPlaceholder: "Tapez un statut ici",
+      showCancelButton: true,
+    });
 
-
-const handleEdit = async (id: string) => {
-  const { value: status } = await Swal.fire({
-    title: 'Enter new status',
-    input: 'text',
-    inputPlaceholder: 'Type any status here',
-    showCancelButton: true,
-  });
-
-  if (status) {
-    try {
-      await updateUser({ id, data: { status } }).unwrap();
-      Swal.fire('Updated!', `Status has been updated to "${status}".`, 'success');
-      refetch();
-    } catch (error) {
-      Swal.fire('Error!', 'Failed to update status.', 'error');
-      console.error('Update error:', error);
+    if (status) {
+      try {
+        await updateUser({ id, data: { status } }).unwrap();
+        Swal.fire("Mis à jour !", `Statut mis à jour à "${status}".`, "success");
+        refetch();
+      } catch (error) {
+        Swal.fire("Erreur !", "Échec de la mise à jour du statut.", "error");
+        console.error("Erreur mise à jour :", error);
+      }
     }
-  }
-};
+  };
 
+  const handleView = (id: any) => console.log("Voir le service :", id);
 
+  const handleDelete = async (id: string) => {
+    const result = await Swal.fire({
+      title: "Êtes-vous sûr ?",
+      text: "Voulez-vous supprimer ce service ?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Oui, supprimer !",
+    });
 
-
-  const handleView = (id: any) => console.log("View service:", id);
-
-
- const handleDelete = async (id: string) => {
-  const result = await Swal.fire({
-    title: "Are you sure?",
-    text: "Do you want to delete this service?",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, delete it!",
-  });
-
-  if (result.isConfirmed) {
-    try {
-      await deleteuser(id).unwrap();
-      Swal.fire("Deleted!", "The service has been deleted.", "success");
-       refetch();
-    } catch (error) {
-      Swal.fire("Error!", "Failed to delete the service.", "error");
-      console.error("Delete error:", error);
+    if (result.isConfirmed) {
+      try {
+        await deleteuser(id).unwrap();
+        Swal.fire("Supprimé !", "Le service a été supprimé.", "success");
+        refetch();
+      } catch (error) {
+        Swal.fire("Erreur !", "Échec de la suppression du service.", "error");
+        console.error("Erreur suppression :", error);
+      }
     }
-  }
-};
+  };
 
+  const handleAddNewService = () => console.log("Ajouter un nouveau service cliqué");
 
-
-
-  const handleAddNewService = () => console.log("Add New Service clicked");
   if (!data) {
-    return <div><LoadingSpinner></LoadingSpinner></div>;
+    return <div><LoadingSpinner /></div>;
   }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 font-sans sm:p-6">
       <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <h1 className="text-2xl font-semibold text-gray-800">
-          Service Listings
-        </h1>
+        <h1 className="text-2xl font-semibold text-gray-800">Liste des services</h1>
         <button
           className="bg-[#F9AA43] flex gap-2 cursor-pointer items-center justify-center p-2 px-4 rounded-xl text-white"
           onClick={handleAddNewService}
         >
-          <FaPlus /> Add New Service
+          <FaPlus /> Ajouter un service
         </button>
       </div>
 
-      {/* Filters */}
+      {/* Filtres */}
       <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4 shadow-sm md:p-6">
         <div className="mb-4 flex items-center gap-2 text-gray-600">
           <FaFilter className="size-4" />
-          <span className="font-medium">Filters:</span>
+          <span className="font-medium">Filtres :</span>
         </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-5">
           <select
@@ -223,7 +203,7 @@ const handleEdit = async (id: string) => {
             onChange={handleFilterChange}
             className="block w-full rounded-md border border-gray-300 py-2 pl-3 pr-10 text-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           >
-            <option value="">Status</option>
+            <option value="">Statut</option>
             {uniqueStatuses.map((status) => (
               <option key={String(status)} value={String(status)}>
                 {String(status)}
@@ -237,7 +217,7 @@ const handleEdit = async (id: string) => {
             onChange={handleFilterChange}
             className="block w-full rounded-md border border-gray-300 py-2 pl-3 pr-10 text-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           >
-            <option value="">Category</option>
+            <option value="">Catégorie</option>
             {uniqueCategories.map((category) => (
               <option key={String(category)} value={String(category)}>
                 {String(category)}
@@ -251,7 +231,7 @@ const handleEdit = async (id: string) => {
             onChange={handleFilterChange}
             className="block w-full rounded-md border border-gray-300 py-2 pl-3 pr-10 text-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           >
-            <option value="">Location</option>
+            <option value="">Localisation</option>
             {uniqueLocations.map((location) => (
               <option key={String(location)} value={String(location)}>
                 {String(location)}
@@ -267,70 +247,38 @@ const handleEdit = async (id: string) => {
             className="block w-full rounded-md border border-gray-300 py-2 pl-3 pr-3 text-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
           />
 
-          <button
-            onClick={handleClearFilters}
-            className="w-full justify-center lg:col-span-1"
-          >
-            <span className="text-yellow-600 cursor-pointer">
-              Clear Filters
-            </span>
+          <button onClick={handleClearFilters} className="w-full justify-center lg:col-span-1">
+            <span className="text-yellow-600 cursor-pointer">Réinitialiser</span>
           </button>
         </div>
       </div>
 
-      {/* Table */}
+      {/* Tableau */}
       <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Service Name
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Provider
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Category
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Location
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Listed Date
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Actions
-              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom du service</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fournisseur</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catégorie</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Localisation</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date d'inscription</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
             {filteredServices?.length > 0 ? (
               filteredServices.map((service: ProviderSummary) => (
                 <tr key={service.id}>
+                  <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-900">{service.workShopName}</td>
+                  <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-900">{service.name}</td>
+                  <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-900">{service.specialist}</td>
                   <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-900">
-                    <div className="font-medium">{service.workShopName}</div>
-                    {/* <div className="text-gray-500">
-                      {service.serviceCategoryId}
-                    </div> */}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-900">
-                    {service.name}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-900">
-                    {service.specialist}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-900">
-                     <LocationCell latitude={service.latitude} longitude={service.longitude} />
+                    <LocationCell latitude={service.latitude} longitude={service.longitude} />
                   </td>
                   <td className="whitespace-nowrap px-4 py-4">
-                    <span
-                      className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${getStatusClasses(
-                        service.status
-                      )}`}
-                    >
+                    <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${getStatusClasses(service.status)}`}>
                       {service.status}
                     </span>
                   </td>
@@ -339,22 +287,13 @@ const handleEdit = async (id: string) => {
                   </td>
                   <td className="whitespace-nowrap px-4 py-4 text-sm font-medium">
                     <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleEdit(service.id)}
-                        title="Edit"
-                      >
+                      <button onClick={() => handleEdit(service.id)} title="Modifier">
                         <FaEdit className="size-4 text-blue-500" />
                       </button>
-                      <button
-                        onClick={() => handleView(service.id)}
-                        title="View"
-                      >
+                      <button onClick={() => handleView(service.id)} title="Voir">
                         <FaEye className="size-4 text-gray-500" />
                       </button>
-                      <button
-                        onClick={() => handleDelete(service.id)}
-                        title="Delete"
-                      >
+                      <button onClick={() => handleDelete(service.id)} title="Supprimer">
                         <FaTrashAlt className="size-4 text-red-500" />
                       </button>
                     </div>
@@ -364,7 +303,7 @@ const handleEdit = async (id: string) => {
             ) : (
               <tr>
                 <td colSpan={7} className="py-8 text-center text-gray-500">
-                  No services found matching your criteria.
+                  Aucun service trouvé avec les critères actuels.
                 </td>
               </tr>
             )}
@@ -375,7 +314,7 @@ const handleEdit = async (id: string) => {
       {/* Pagination */}
       <div className="mt-6 flex flex-col items-center justify-between gap-4 md:flex-row">
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-700">Show</span>
+          <span className="text-sm text-gray-700">Afficher</span>
           <select
             value={itemsPerPage}
             onChange={(e) => {
@@ -390,17 +329,14 @@ const handleEdit = async (id: string) => {
               </option>
             ))}
           </select>
-          <span className="text-sm text-gray-700">entries</span>
+          <span className="text-sm text-gray-700">entrées</span>
         </div>
 
         <div className="text-sm text-gray-700">
-          Showing {startItem} to {endItem} of {totalItems} entries
+          Affichage de {startItem} à {endItem} sur {totalItems} entrées
         </div>
 
-        <nav
-          className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm"
-          aria-label="Pagination"
-        >
+        <nav className="relative z-0 inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
           <button
             onClick={() => paginate(currentPage - 1)}
             disabled={currentPage === 1}
