@@ -45,7 +45,9 @@ const baseQuery=fetchBaseQuery({baseUrl:'https://freepik.softvenceomega.com/gntl
                                     headers.set('authorization',`${token}`)
                         }
                     return headers;
-              }
+              },
+
+            
                     
 })
 

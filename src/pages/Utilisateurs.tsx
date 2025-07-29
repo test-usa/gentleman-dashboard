@@ -40,14 +40,11 @@ const Utilisateurs = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const { data,refetch  } = useGetServiceListingQuery(currentPage);
-  // console.log(data)
+ 
 const [deleteuser] = useDeleteUserMutation();
 
-console.log(deleteuser)
 
 const [updateUser] = useUpdateUserMutation();
-
-console.log(updateUser)
 
 
 
