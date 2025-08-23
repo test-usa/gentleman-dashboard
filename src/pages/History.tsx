@@ -81,7 +81,7 @@ const History = () => {
     transtion?.data && transtion.data.length > 0
       ? transtion.data.filter((item: TTransactionItem) =>
           item.senderPaymentTransaction
-            .toLowerCase()
+            ?.toLowerCase()
             .includes(searchTerm.toLowerCase())
         )
       : demoTransactions.filter((item) =>

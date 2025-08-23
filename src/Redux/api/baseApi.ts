@@ -35,7 +35,7 @@ import type {
 import { setUser } from "../features/auth/authSlice";
 import type { RootState } from "../store";
 
-const baseQuery=fetchBaseQuery({baseUrl:'https://freepik.softvenceomega.com/gntl/v1',
+const baseQuery=fetchBaseQuery({baseUrl:'http://147.93.29.211:5012/gntl/v1',
 
             // credentials:'include',
             prepareHeaders: (headers, { getState }) => {
