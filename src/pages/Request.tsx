@@ -21,6 +21,8 @@ const Request = () => {
   const { data: singleData } = useGetSingleDataRequestQuery(id);
   const [patchSingleDataRequest] = usePatchSingleDataRequestMutation();
 
+  console.log(singleData)
+
   useEffect(() => {
     if (allCases?.data?.data?.length > 0 && !id) {
       setId(allCases.data.data[0].id);

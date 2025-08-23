@@ -10,7 +10,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaEdit,
-  FaEye,
+
   FaFilter,
   FaPlus,
   FaTrashAlt,
@@ -147,7 +147,7 @@ const Utilisateurs = () => {
     }
   };
 
-  const handleView = (id: any) => console.log("Voir le service :", id);
+  // const handleView = (id: any) => console.log("Voir le service :", id);
 
   const handleDelete = async (id: string) => {
     const result = await Swal.fire({
@@ -179,7 +179,7 @@ const Utilisateurs = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 font-sans sm:p-6">
+    <div className="min-h-screen  p-4 font-sans sm:p-6">
       <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <h1 className="text-2xl font-semibold text-gray-800">Liste des services</h1>
         <button
@@ -290,9 +290,9 @@ const Utilisateurs = () => {
                       <button onClick={() => handleEdit(service.id)} title="Modifier">
                         <FaEdit className="size-4 text-blue-500" />
                       </button>
-                      <button onClick={() => handleView(service.id)} title="Voir">
+                      {/* <button onClick={() => handleView(service.id)} title="Voir">
                         <FaEye className="size-4 text-gray-500" />
-                      </button>
+                      </button> */}
                       <button onClick={() => handleDelete(service.id)} title="Supprimer">
                         <FaTrashAlt className="size-4 text-red-500" />
                       </button>
