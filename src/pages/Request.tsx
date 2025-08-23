@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { translateText } from "@/lib/translator";
 import { useGetAllSimillerCaseQuery } from "@/Redux/features/dashboard/request/getAllSimillerCaseApi";
 import { useGetSingleDataRequestQuery } from "@/Redux/features/dashboard/request/getSingleDataRequestApi";
 import { usePatchSingleDataRequestMutation } from "@/Redux/features/dashboard/request/patchSingleDataRequestApi";
@@ -96,7 +97,7 @@ const Request = () => {
                   : "RF-2024-01-23"}
               </h2>
               <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-800">
-                {singleData?.data?.status || "En attente de révision"}
+                {translateText(singleData?.data?.status || "En attente de révision")}
               </span>
             </div>
 
@@ -303,7 +304,7 @@ const Request = () => {
                           : "bg-yellow-100 text-yellow-800"
                       }`}
                     >
-                      {item.status ?? "En attente"}
+                      {translateText(item.status ?? "En attente")}
                     </span>
                   </div>
                 </div>

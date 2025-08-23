@@ -39,7 +39,7 @@ const Sidebar = () => {
   }
 
   const menuItems = [
-    { to: "/", icon: <IoHome className="w-5 h-5" />, text: "Dashboard" },
+    { to: "/", icon: <IoHome className="w-5 h-5" />, text: "Tableau de bord" },
     { to: "/utilisateurs", icon: <IoBarChart className="w-5 h-5" />, text: "Utilisateurs" },
     { to: "/history", icon: <FaHistory className="w-5 h-5" />, text: "Historique" },
     { to: "/request", icon: <IoSettingsSharp className="w-5 h-5" />, text: "Requêtes" },

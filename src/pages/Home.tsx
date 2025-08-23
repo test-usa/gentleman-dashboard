@@ -292,6 +292,7 @@ export default function Home() {
                               : report.status?.toLowerCase() === "pending"
                                 ? "bg-yellow-100 text-yellow-800"
                                 : report.status?.toLowerCase() === "complete"
+                                
                                   ? "bg-transparent border border-gray-400 text-gray-800"
                                   : "bg-red-100 text-red-800"
                             }
