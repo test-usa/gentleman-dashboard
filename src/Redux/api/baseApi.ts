@@ -35,7 +35,7 @@ import type {
 import { setUser } from "../features/auth/authSlice";
 import type { RootState } from "../store";
 
-const baseQuery=fetchBaseQuery({baseUrl:'http://147.93.29.211:5012/gntl/v1',
+const baseQuery=fetchBaseQuery({baseUrl:'https://findcarpros.com/gntl/v1',
 
             // credentials:'include',
             prepareHeaders: (headers, { getState }) => {
@@ -58,7 +58,7 @@ const baseQueryWithRefreshToken:BaseQueryFn<FetchArgs,BaseQueryApi,DefinitionTyp
             if (result?.error?.status === 401) {
                 console.log("sending refresh token");
         
-                const res = await fetch("https://freepik.softvenceomega.com/gntl/v1/auth/refresh-token", {
+                const res = await fetch("https://findcarpros.com/gntl/v1/auth/refresh-token", {
                     method: "POST",
                     credentials: "include",
                 });

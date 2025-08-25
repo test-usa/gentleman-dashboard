@@ -14,13 +14,17 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { FaChevronDown, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { MdNotificationsNone, MdSearch } from "react-icons/md";
-import { Button } from "@/components/ui/button";
+import { MdSearch } from "react-icons/md";
+// import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useGetSingleDataRequestQuery } from "@/Redux/features/dashboard/request/getSingleDataRequestApi";
 import { translateText } from "@/lib/translator";
+import { useGetUserDataQuery, useUpdateUserProfileMutation } from "@/Redux/features/auth/loginApi";
+import { useAppSelector } from "@/Redux/hook";
+import type { TUser } from "@/Redux/features/auth/authSlice";
+import { baseApi } from "@/Redux/api/baseApi";
 
 // Dummy UI components with Tailwind styles
 const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
@@ -76,10 +80,46 @@ export default function Home() {
   const { data: piChart } = useGetPiChartQuery(undefined);
   const { data: monthlyStatus } = useGetMonthlyStatusQuery(undefined);
   const { data } = useGetMetaDataQuery(undefined);
+  const user = useAppSelector((state) => state.auth.user) as TUser & { id: string }
+  console.log({ user })
+
+  const { data: userData, refetch } = useGetUserDataQuery({ id: user?.id })
+  const profileData = userData?.data.user
+  console.log(profileData)
+
+
+  const [updateUserProfile] = useUpdateUserProfileMutation();
 
 
 
   console.log("piechart:", piChart, "monthlyStatus:", monthlyStatus, "data:", data)
+
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Preview locally
+    const reader = new FileReader();
+    reader.onloadend = () => setPreviewImage(reader.result as string);
+    reader.readAsDataURL(file);
+
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      await updateUserProfile(formData).unwrap(); // send only formData
+      console.log("Profile image updated successfully!");
+      refetch(); // update frontend with new image
+    } catch (err) {
+      console.error("Error updating profile:", err);
+    }
+  };
+
+
+
+
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -150,30 +190,51 @@ export default function Home() {
         {/* Right: Notification, language selector, user profile */}
         <div className="flex items-center text-black gap-4">
           {/* Notification icon */}
-          <Button variant="ghost" size="icon" aria-label="Notifications">
+          {/* <Button variant="ghost" size="icon" aria-label="Notifications">
             <MdNotificationsNone className="w-6 h-6" />
-          </Button>
+          </Button> */}
 
           {/* Language dropdown (static) */}
-          <div className="flex items-center gap-1 cursor-pointer">
+          {/* <div className="flex items-center gap-1 cursor-pointer">
             <span className="text-sm">FR</span>
             <FaChevronDown className="w-3 h-3" />
-          </div>
+          </div> */}
 
           {/* User profile */}
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden flex items-center justify-center text-white font-medium text-sm">
-              <img
-                src="/profile.jpg"
-                alt="Admin"
-                className="object-cover w-full h-full"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                  e.currentTarget.parentElement!.textContent = "AD";
-                }}
-              />
-            </div>
-            <span className="font-medium">Admin</span>
+            {profileData && (
+              <div className="relative w-10 h-10 cursor-pointer">
+                {/* Hidden file input */}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="absolute inset-0 w-full h-full opacity-0 z-10 cursor-pointer"
+                />
+
+                {/* Avatar display */}
+                <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden flex items-center justify-center text-white font-medium text-sm">
+                  {previewImage ? (
+                    <img src={previewImage} alt="Profile" className="object-cover w-full h-full" />
+                  ) : profileData?.image ? (
+                    <img
+                      src={profileData.image ? `${baseApi}${profileData.image}` : undefined}
+                      alt={profileData.name || "Admin"}
+                      className="object-cover w-full h-full"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        e.currentTarget.parentElement!.textContent =
+                          profileData.name?.[0].toUpperCase() || "AD";
+                      }}
+                    />
+                  ) : (
+                    (profileData.name?.[0] || "A").toUpperCase()
+                  )}
+                </div>
+              </div>
+            )}
+
+            <span className="font-medium">{profileData.role}</span>
           </div>
         </div>
       </header>
@@ -292,7 +353,7 @@ export default function Home() {
                               : report.status?.toLowerCase() === "pending"
                                 ? "bg-yellow-100 text-yellow-800"
                                 : report.status?.toLowerCase() === "complete"
-                                
+
                                   ? "bg-transparent border border-gray-400 text-gray-800"
                                   : "bg-red-100 text-red-800"
                             }
