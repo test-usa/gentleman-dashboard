@@ -13,11 +13,13 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch()
-
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const result = await login({email,password});
+      console.log("----------------------------------------------------")
+      console.log(result)
       if(result?.data?.success){
         dispatch(setUser({user:result?.data?.data?.user, token:result?.data?.data?.accessToken
 }))
