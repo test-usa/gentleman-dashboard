@@ -1,15 +1,16 @@
 import { Button } from "@/components/ui/button";
+import { translateText } from "@/lib/translator";
 import { useGetAllSimillerCaseQuery } from "@/Redux/features/dashboard/request/getAllSimillerCaseApi";
 import { useGetSingleDataRequestQuery } from "@/Redux/features/dashboard/request/getSingleDataRequestApi";
 import { usePatchSingleDataRequestMutation } from "@/Redux/features/dashboard/request/patchSingleDataRequestApi";
 import { format } from "date-fns";
 import { useState, useEffect } from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
+
 interface RefundResponse {
   success: boolean;
   message?: string;
 }
-
 
 const Request = () => {
   const [action, setAction] = useState("");
@@ -18,12 +19,10 @@ const Request = () => {
   const [note, setNote] = useState("");
 
   const { data: allCases } = useGetAllSimillerCaseQuery(undefined);
-  console.log("allcase:", allCases);
   const { data: singleData } = useGetSingleDataRequestQuery(id);
-
-  console.log(singleData);
   const [patchSingleDataRequest] = usePatchSingleDataRequestMutation();
-  console.log(patchSingleDataRequest);
+
+  console.log(singleData)
 
   useEffect(() => {
     if (allCases?.data?.data?.length > 0 && !id) {
@@ -38,29 +37,28 @@ const Request = () => {
   }, [action]);
 
   const simulateRefundSubmission = async (): Promise<RefundResponse> => {
-  return {
-    success: true,
-    message: "Refund processed"
+    return {
+      success: true,
+      message: "Remboursement effectué",
+    };
   };
-};
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  e.preventDefault();
-  if (action === "refund") {
-    const res: RefundResponse = await simulateRefundSubmission();
-    if (res.success) {
-      setRefundSubmitted(true);
+    e.preventDefault();
+    if (action === "refund") {
+      const res: RefundResponse = await simulateRefundSubmission();
+      if (res.success) {
+        setRefundSubmitted(true);
+      }
     }
-  }
-};
-
+  };
 
   const handleConfirm = async () => {
     if (!id) return;
 
     if (action === "nonrefund" || (action === "refund" && refundSubmitted)) {
       const body = {
-        note: note || "Issue was reviewed and processed",
+        note: note || "Le problème a été examiné et traité",
         status:
           singleData?.data?.status === "PENDING"
             ? "APPROVED"
@@ -70,9 +68,9 @@ const Request = () => {
 
       try {
         await patchSingleDataRequest({ id, body }).unwrap();
-        console.log("Update successful");
+        console.log("Mise à jour réussie");
       } catch (error) {
-        console.error("Update failed", error);
+        console.error("Échec de la mise à jour", error);
       }
     }
   };
@@ -83,14 +81,14 @@ const Request = () => {
   return (
     <div className="h-full bg-gray-50 p-6 font-sans">
       <h1 className="mb-6 text-2xl font-semibold text-gray-800">
-        Request Management
+        Gestion des Demandes
       </h1>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="col-span-2 space-y-6">
           <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-xl font-medium text-gray-800">
-                Request #
+                Demande #
                 {singleData?.data?.updatedAt
                   ? `RF-${format(
                       new Date(singleData.data.updatedAt),
@@ -99,23 +97,23 @@ const Request = () => {
                   : "RF-2024-01-23"}
               </h2>
               <span className="rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-800">
-                {singleData?.data?.status || "Pending Review"}
+                {translateText(singleData?.data?.status || "En attente de révision")}
               </span>
             </div>
 
             <p className="mb-6 text-sm text-gray-500">
-              Submitted on{" "}
+              Soumis le{" "}
               {singleData?.data?.updatedAt
                 ? format(
                     new Date(singleData.data.updatedAt),
-                    "MMM dd, yyyy 'at' hh:mm a"
+                    "dd MMM yyyy 'à' HH:mm"
                   )
-                : "Jan 23, 2024 at 10:45 AM"}
+                : "23 Janvier 2024 à 10:45"}
             </p>
 
             <div className="grid grid-cols-2 gap-y-6">
               <div>
-                <p className="text-sm text-gray-500">Customer</p>
+                <p className="text-sm text-gray-500">Client</p>
                 <p className="text-base font-semibold text-gray-800">
                   {user?.name || "Sarah Johnson"}
                 </p>
@@ -124,7 +122,7 @@ const Request = () => {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Professional</p>
+                <p className="text-sm text-gray-500">Professionnel</p>
                 <p className="text-base font-semibold text-gray-800">
                   {provider?.name || "Michael Brown"}
                 </p>
@@ -135,16 +133,18 @@ const Request = () => {
             </div>
 
             <div className="mt-6">
-              <p className="text-sm text-gray-500">Request Amount</p>
+              <p className="text-sm text-gray-500">Montant demandé</p>
               <p className="text-2xl font-bold text-gray-800">
                 ${singleData?.data?.requestedAmount || "249.99"}
               </p>
             </div>
           </div>
 
+          {/* sssss */}
+
           <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h3 className="mb-4 text-lg font-medium text-gray-800">
-              Select Action
+              Sélectionner une action
             </h3>
             <form onSubmit={handleSubmit}>
               <select
@@ -152,37 +152,37 @@ const Request = () => {
                 value={action}
                 onChange={(e) => setAction(e.target.value)}
               >
-                <option value="">Select an action</option>
-                <option value="refund">Refund</option>
-                <option value="nonrefund">Non-Refund</option>
+                <option value="">Choisir une action</option>
+                <option value="refund">Remboursement</option>
+                <option value="nonrefund">Pas de remboursement</option>
               </select>
 
               {action === "refund" && (
                 <>
                   <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="border rounded-md p-3 bg-gray-50">
-                      <p className="font-semibold text-gray-700">User Info</p>
-                      <p>Name: {user?.name || "N/A"}</p>
+                      <p className="font-semibold text-gray-700">Client</p>
+                      <p>Nom: {user?.name || "N/A"}</p>
                       <p>Email: {user?.email || "N/A"}</p>
-                      <p>Balance: {user?.balance || "N/A"}</p>
-                      <p>Phone: {user?.phone || "N/A"}</p>
-                      <p>Address: {user?.address || "N/A"}</p>
+                      <p>Solde: {user?.balance || "N/A"}</p>
+                      <p>Téléphone: {user?.phone || "N/A"}</p>
+                      <p>Adresse: {user?.address || "N/A"}</p>
                     </div>
                     <div className="border rounded-md p-3 bg-gray-50">
                       <p className="font-semibold text-gray-700">
-                        Provider Info
+                        Prestataire
                       </p>
-                      <p>Name: {provider?.name || "N/A"}</p>
+                      <p>Nom: {provider?.name || "N/A"}</p>
                       <p>Email: {provider?.email || "N/A"}</p>
-                      <p>Balance: {provider?.balance || "N/A"}</p>
-                      <p>Phone: {provider?.phone || "N/A"}</p>
-                      <p>Address: {provider?.address || "N/A"}</p>
+                      <p>Solde: {provider?.balance || "N/A"}</p>
+                      <p>Téléphone: {provider?.phone || "N/A"}</p>
+                      <p>Adresse: {provider?.address || "N/A"}</p>
                     </div>
                   </div>
 
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">
-                      User ID
+                      ID Client
                     </label>
                     <input
                       type="text"
@@ -193,7 +193,7 @@ const Request = () => {
                   </div>
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">
-                      Provider ID
+                      ID Prestataire
                     </label>
                     <input
                       type="text"
@@ -207,7 +207,7 @@ const Request = () => {
                     type="submit"
                     className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition"
                   >
-                    Submit
+                    Soumettre
                   </button>
                 </>
               )}
@@ -215,27 +215,27 @@ const Request = () => {
 
             <div className="mt-6">
               <h3 className="mb-2 text-lg font-medium text-gray-800">
-                Add a note (optional)
+                Ajouter une note (optionnel)
               </h3>
               <textarea
                 className="block w-full resize-none rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 rows={3}
-                placeholder="Enter your note here..."
+                placeholder="Écrivez votre note ici..."
                 maxLength={500}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
               ></textarea>
               <p className="text-right text-xs text-gray-400">
-                {note.length}/500 characters
+                {note.length}/500 caractères
               </p>
             </div>
 
             <div className="mt-6 flex items-center rounded-md bg-orange-50 p-3 text-orange-700">
               <FaExclamationTriangle className="mr-2 size-5" />
               <p className="text-sm">
-                <span className="font-semibold">Action Preview</span>
+                <span className="font-semibold">Aperçu de l'action</span>
                 <br />
-                Select an action to see the preview and potential impact.
+                Sélectionnez une action pour voir l'aperçu et son impact.
               </p>
             </div>
 
@@ -249,13 +249,13 @@ const Request = () => {
                 onClick={handleConfirm}
                 disabled={action === "refund" && !refundSubmitted}
               >
-                Confirm Action
+                Confirmer l'action
               </Button>
               <Button
                 variant={"ghost"}
                 className="hover:bg-orange-500 cursor-pointer"
               >
-                Cancel
+                Annuler
               </Button>
             </div>
           </div>
@@ -264,7 +264,7 @@ const Request = () => {
         <div className="col-span-1 space-y-6">
           <div className="rounded-lg border h-full border-gray-200 bg-white p-6 shadow-sm">
             <h3 className="mb-4 text-lg font-medium text-gray-800">
-              Similar Cases
+              Cas Similaires
             </h3>
             {allCases?.data?.data?.map(
               (
@@ -306,7 +306,7 @@ const Request = () => {
                           : "bg-yellow-100 text-yellow-800"
                       }`}
                     >
-                      {item.status ?? "Pending"}
+                      {translateText(item.status ?? "En attente")}
                     </span>
                   </div>
                 </div>

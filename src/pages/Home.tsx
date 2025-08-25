@@ -14,8 +14,13 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronDown, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import { MdNotificationsNone, MdSearch } from "react-icons/md";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useGetSingleDataRequestQuery } from "@/Redux/features/dashboard/request/getSingleDataRequestApi";
+import { translateText } from "@/lib/translator";
 
 // Dummy UI components with Tailwind styles
 const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
@@ -64,6 +69,7 @@ type Report = {
   createdAt: string;
   refundType?: string;
   description: string;
+  status: string;
 };
 
 export default function Home() {
@@ -71,7 +77,9 @@ export default function Home() {
   const { data: monthlyStatus } = useGetMonthlyStatusQuery(undefined);
   const { data } = useGetMetaDataQuery(undefined);
 
-    console.log("piechart:", piChart,  "monthlyStatus:", monthlyStatus, "data:",data)
+
+
+  console.log("piechart:", piChart, "monthlyStatus:", monthlyStatus, "data:", data)
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -110,15 +118,72 @@ export default function Home() {
     }
   };
 
+
+
+  type SingleUserNameProps = {
+    reportId: string;
+  };
+
+  const SingleUserName = ({ reportId }: SingleUserNameProps) => {
+    const { data: singleData, isLoading } = useGetSingleDataRequestQuery(reportId);
+    console.log("sldkfjlsjf", singleData)
+
+    if (isLoading) return <span>Loading...</span>;
+    return <span>{singleData?.data?.booking?.user?.name || "Utilisateur inconnu"}</span>;
+  };
+
+
   return (
     <div className="min-h-screen space-y-6">
+
+
+      <header className="bg-[#f0f0f0] px-6 py-4 flex justify-between items-center flex-shrink-0">
+        <div className="max-w-sm w-full relative">
+          <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <Input
+            type="text"
+            placeholder="Researcher..."
+            className="w-full pl-10 border-black bg-[#FFFFFF]" // add padding-left for icon space
+          />
+        </div>
+
+        {/* Right: Notification, language selector, user profile */}
+        <div className="flex items-center text-black gap-4">
+          {/* Notification icon */}
+          <Button variant="ghost" size="icon" aria-label="Notifications">
+            <MdNotificationsNone className="w-6 h-6" />
+          </Button>
+
+          {/* Language dropdown (static) */}
+          <div className="flex items-center gap-1 cursor-pointer">
+            <span className="text-sm">FR</span>
+            <FaChevronDown className="w-3 h-3" />
+          </div>
+
+          {/* User profile */}
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden flex items-center justify-center text-white font-medium text-sm">
+              <img
+                src="/profile.jpg"
+                alt="Admin"
+                className="object-cover w-full h-full"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  e.currentTarget.parentElement!.textContent = "AD";
+                }}
+              />
+            </div>
+            <span className="font-medium">Admin</span>
+          </div>
+        </div>
+      </header>
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { title: "Utilisateurs actifs", value: activeUsers, growth: "+12%" },
-          { title: "Professionnels vérifiés", value: verifiedProfessionals, growth: "+5%" },
-          { title: "Réservations du jour", value: bookingsToday, growth: "+8%" },
-          { title: "Revenu mensuel", value: monthlyRevenue, growth: "+15%" },
+          { title: "Utilisateurs actifs", value: activeUsers, growth: "" },
+          { title: "Professionnels vérifiés", value: verifiedProfessionals, growth: "" },
+          { title: "Réservations du jour", value: bookingsToday, growth: "" },
+          { title: "Revenu mensuel", value: monthlyRevenue, growth: "" },
         ].map((item, idx) => (
           <Card key={idx}>
             <CardContent className="p-6">
@@ -189,7 +254,7 @@ export default function Home() {
       {/* Recent Activity Table */}
       <Card>
         <CardHeader className="p-4 border-b border-gray-200">
-          <CardTitle>Recent Activity</CardTitle>
+          <CardTitle>Activité récente</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
           <div className="overflow-x-auto">
@@ -210,16 +275,32 @@ export default function Home() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {reports.map((report:Report) => (
+                  {reports.map((report: Report) => (
                     <tr key={report.id} className="hover:bg-gray-50">
                       <td className="py-4 px-4 text-sm text-gray-900">
                         {format(new Date(report.createdAt), "dd MMM yyyy")}
                       </td>
-                      <td className="py-4 px-4 text-sm text-gray-900">{report.refundType || "N/A"}</td>
-                      <td className="py-4 px-4 text-sm text-gray-900">Utilisateur inconnu</td>
-                      <td className="py-4 px-4 text-sm text-gray-900">{report.description}</td>
+                      <td className="py-4 px-4 text-sm text-gray-900">{translateText(report.refundType || "N/A")}</td>
+                      <td className="py-4 px-4 text-sm text-gray-900"><SingleUserName reportId={report.id} /></td>
+                      <td className="py-4 px-4 text-sm text-gray-900">  {report.description}</td>
                       <td className="py-4 px-4">
-                        <Badge className="bg-yellow-100 text-yellow-800 border-0">Pending</Badge>
+                        <Badge
+                          className={`
+    border-0
+    ${report.status?.toLowerCase() === "approved"
+                              ? "bg-green-100 text-green-800"
+                              : report.status?.toLowerCase() === "pending"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : report.status?.toLowerCase() === "complete"
+                                
+                                  ? "bg-transparent border border-gray-400 text-gray-800"
+                                  : "bg-red-100 text-red-800"
+                            }
+  `}
+                        >
+                          {translateText(report.status)}
+                        </Badge>
+
                       </td>
                     </tr>
                   ))}
@@ -267,11 +348,10 @@ export default function Home() {
                 <button
                   key={pg}
                   onClick={() => paginate(pg)}
-                  className={`relative z-10 px-2 py-1 border cursor-pointer text-sm ${
-                    currentPage === pg
-                      ? "bg-[#F9AA43] text-white border-[#F9AA43]"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                  }`}
+                  className={`relative z-10 px-2 py-1 border cursor-pointer text-sm ${currentPage === pg
+                    ? "bg-[#F9AA43] text-white border-[#F9AA43]"
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                    }`}
                 >
                   {pg}
                 </button>
