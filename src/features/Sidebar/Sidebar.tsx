@@ -43,6 +43,8 @@ const Sidebar = () => {
     { to: "/utilisateurs", icon: <IoBarChart className="w-5 h-5" />, text: "Utilisateurs" },
     { to: "/history", icon: <FaHistory className="w-5 h-5" />, text: "Historique" },
     { to: "/request", icon: <IoSettingsSharp className="w-5 h-5" />, text: "Requêtes" },
+    { to: "/service", icon: <IoSettingsSharp className="w-5 h-5" />, text: "Service" },
+    { to: "/categories", icon: <IoSettingsSharp className="w-5 h-5" />, text: "Categorie" },
   ]
 
   return (
