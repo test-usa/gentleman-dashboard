@@ -24,7 +24,7 @@ import { translateText } from "@/lib/translator";
 import { useGetUserDataQuery, useUpdateUserProfileMutation } from "@/Redux/features/auth/loginApi";
 import { useAppSelector } from "@/Redux/hook";
 import type { TUser } from "@/Redux/features/auth/authSlice";
-import { baseApi } from "@/Redux/api/baseApi";
+
 
 // Dummy UI components with Tailwind styles
 const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
@@ -218,8 +218,8 @@ export default function Home() {
                     <img src={previewImage} alt="Profile" className="object-cover w-full h-full" />
                   ) : profileData?.image ? (
                     <img
-                      src={profileData.image ? `${baseApi}${profileData.image}` : undefined}
-                      alt={profileData.name || "Admin"}
+                      src={profileData?.image}
+                      alt={profileData?.name || "Admin"}
                       className="object-cover w-full h-full"
                       onError={(e) => {
                         e.currentTarget.style.display = "none";
